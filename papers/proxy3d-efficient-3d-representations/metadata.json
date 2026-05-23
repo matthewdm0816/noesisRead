@@ -1,0 +1,28 @@
+{
+  "title": "Proxy3D: Efficient 3D Representations for Vision-Language Models via Semantic Clustering and Alignment",
+  "authors": [
+    "Jerry Jiang",
+    "Haowen Sun",
+    "Denis Gudovskiy",
+    "Yohei Nakata",
+    "Tomoyuki Okuno",
+    "Kurt Keutzer",
+    "Wenzhao Zheng"
+  ],
+  "abstract": "Spatial intelligence is essential for vision-language models (VLMs) to reason about the 3D world. Most existing methods adopt the conventional 2D pipeline in VLMs and use pixel-aligned representations for the vision modality. However, correspondence-based models with implicit 3D scene understanding often fail to achieve spatial consistency, and representation-based models with 3D geometric priors lack efficiency in vision sequence serialization. To address these issues, we propose Proxy3D, which constructs compact yet comprehensive 3D proxy representations for the vision modality. Given video frames as input, Proxy3D employs semantic and geometric encoders to extract scene features and performs semantic-aware clustering to obtain a set of proxies in the 3D space. We also curate the SpaceSpan dataset and apply multi-stage training to progressively align these 3D proxy representations with the VLM. Extensive experiments demonstrate that Proxy3D achieves competitive or state-of-the-art performance in 3D visual question answering, visual grounding, and general spatial intelligence benchmarks, while using shorter sequences for vision information.",
+  "year": 2026,
+  "venue": "CVPR 2026",
+  "arxiv_id": "2605.08064",
+  "arxiv_url": "https://arxiv.org/abs/2605.08064",
+  "pdf_url": "https://arxiv.org/pdf/2605.08064",
+  "doi": "10.48550/arXiv.2605.08064",
+  "published": true,
+  "note": "Accepted by CVPR 2026. Authors from Tsinghua University, Panasonic AI Lab/DX-CPS, and UC Berkeley. Corresponding author: Wenzhao Zheng.",
+  "opensource": {
+    "code": [{"url": "https://github.com/Spacedreamer2384/Proxy3D", "description": "Official PyTorch implementation with multi-stage training pipeline, evaluation code, and environment configs", "verified": true}],
+    "data": [{"url": "https://huggingface.co/datasets/Spacewanderer8263/Proxy3D-SpaceSpan-318K", "description": "SpaceSpan 318K training dataset (387GB) with multi-stage training instructions, semantic embeddings, segmentation masks, and geometric data", "verified": true}],
+    "model": [{"url": "https://huggingface.co/Spacewanderer8263/Proxy3D-8B", "description": "Pre-trained Proxy3D-8B model weights (Qwen2.5-VL backbone, ~16.6GB, 4 safetensors shards)", "verified": true}],
+    "project_page": "https://wzzheng.net/Proxy3D",
+    "summary": "完整开源：代码（Apache-2.0）、SpaceSpan 318K 数据集（387GB）、预训练 8B 模型权重均已发布。"
+  }
+}

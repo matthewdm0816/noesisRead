@@ -1,0 +1,43 @@
+{
+  "title": "OmniEVA: Embodied Versatile Planner via Task-Adaptive 3D-Grounded and Embodiment-aware Reasoning",
+  "authors": [
+    "Yuecheng Liu",
+    "Dafeng Chi",
+    "Shiguang Wu",
+    "Zhanguang Zhang",
+    "Yuzheng Zhuang",
+    "Bowen Yang",
+    "He Zhu",
+    "Lingfeng Zhang",
+    "Pengwei Xie",
+    "David Gamaliel Arcos Bravo",
+    "Yingxue Zhang",
+    "Jianye Hao",
+    "Xingyue Quan"
+  ],
+  "abstract": "Multimodal large language models (MLLMs) have advanced embodied intelligence, but two key gaps remain: a Geometric Adaptability Gap, where models with only 2D inputs or hard-coded 3D geometry injection struggle with spatial generalization, and an Embodiment Constraint Gap, where prior work often ignores the physical constraints and capacities of real robots. OmniEVA introduces two innovations: (1) a Task-Adaptive 3D Grounding mechanism using a gated router to perform explicit selective regulation of 3D fusion, and (2) an Embodiment-Aware Reasoning framework that incorporates task goals and embodiment constraints into the reasoning loop. Results show state-of-the-art general embodied reasoning performance across multiple benchmarks.",
+  "year": 2025,
+  "venue": "ICLR 2026",
+  "arxiv_id": "2509.09332",
+  "arxiv_url": "https://arxiv.org/abs/2509.09332",
+  "pdf_url": "https://arxiv.org/pdf/2509.09332",
+  "doi": "10.48550/arXiv.2509.09332",
+  "published": true,
+  "project_page": "https://omnieva.github.io",
+  "subjects": [
+    "cs.RO",
+    "cs.AI",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "submitted": "2025-09-11",
+  "revised": "2026-01-28",
+  "note": "Published as a conference paper at ICLR 2026. First submitted Sept 2025, last revised Jan 2026.",
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": "https://omnieva.github.io",
+    "summary": "代码和 benchmark 尚未发布。项目页面标注 'coming soon'，论文 Reproducibility Statement 声明'Source code and benchmark datasets will be released upon acceptance'。GitHub 组织 OmniEVA 已存在但仅有 github.io 页面，无实际代码仓库。"
+  }
+}

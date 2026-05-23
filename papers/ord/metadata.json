@@ -1,0 +1,19 @@
+{
+  "title": "ORD: Object-Relation Decoupling for Generalized 3D Visual Grounding",
+  "authors": [
+    "Ronggang Huang",
+    "FanSen Meng",
+    "Huaidong Zhang",
+    "Xuemiao Xu"
+  ],
+  "abstract": "3D visual grounding aims to accurately identify and ground target objects in 3D space based on natural language descriptions, where relative relations between target and anchor objects play a crucial role. However, in existing methods, relative relations are often tightly entangled with entity semantics, which encourages models to rely on semantic shortcuts from entity names, thereby hurting generalization in multi-view and complex multi-object settings. To address this, we propose an object-relation decoupling framework that treats target-anchor relations as first-class geometric and semantic primitives and models them explicitly through three components: (1) a scene-level relative geometric representation that encodes direction and distance between target and anchor, along with a scene-level hyper-object token as a unified prior for scale and viewpoint; (2) a predicate-decoupled cross-modal alignment strategy that preserves only predicates carrying spatial relational semantics while masking out all other tokens, thereby suppressing semantic leakage from entity names; and (3) an anchor-guided regression module that predicts auxiliary anchors and samples features to guide entity semantics learning from text, explicitly injecting target-anchor priors. Extensive experiments on multiple 3D visual grounding benchmarks demonstrate that our method consistently outperforms state-of-the-art approaches with strong robustness and generalization under challenging multi-view and relation-intensive settings.",
+  "year": 2026,
+  "venue": "CVPR 2026",
+  "arxiv_id": "",
+  "arxiv_url": "",
+  "pdf_url": "",
+  "doi": "",
+  "published": true,
+  "note": "CVPR 2026 poster paper. Conference date: June 7, 2026. No arXiv preprint found. No public PDF available yet as CVPR 2026 has not taken place (as of May 23, 2026). CVPR virtual poster page: https://cvpr.thecvf.com/virtual/2026/poster/38718. Same research group as ViewSRD (ICCV 2025).",
+  "cvpr_url": "https://cvpr.thecvf.com/virtual/2026/poster/38718"
+}

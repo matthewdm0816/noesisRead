@@ -1,0 +1,15 @@
+{
+  "title": "Merge3D: Efficient 3D Multimodal LLMs via Joint 2D-3D Token Merging",
+  "authors": ["Tianbo Pan", "Xingyi Yang", "Xinchao Wang"],
+  "abstract": "3D scene understanding is increasingly powered by Multimodal Large Language Models (MLLMs), yet the primary bottleneck remains the substantial computational burden associated with processing multi-view, lengthy visual token sequences. We propose Merge3D, a geometry-aware token merging framework that integrates both 3D geometry and 2D semantic information. At its core is a Semantic-Geometric Token Merger (SemGeo Merger), which bridges the modalities: 2D attention is used to select semantically salient dominant tokens, while a hybrid 2D+3D similarity is employed to aggregate contextual tokens from spatially coherent 3D neighborhoods. This design preserves 3D structural priors and inter-frame correspondences under aggressive compression. Extensive experiments on 3D scene understanding benchmarks, including Scan2Cap, CV-Bench, and BLINK, show that Merge3D achieves up to 70% visual token reduction and up to approximately 3x inference speedup while maintaining strong performance.",
+  "year": 2026,
+  "venue": "CVPR 2026",
+  "arxiv_id": "unknown",
+  "arxiv_url": "unknown",
+  "pdf_url": "unknown",
+  "doi": "unknown",
+  "published": true,
+  "cvpr_poster_url": "https://cvpr.thecvf.com/virtual/2026/poster/38939",
+  "youtube_url": "https://www.youtube.com/watch?v=LpVsuM_st1k",
+  "note": "CVPR 2026 poster, presentation on June 7, 2026. No arXiv preprint found as of May 23, 2026. The CVF Open Access PDF is also not yet available (404). Authors are from NUS (National University of Singapore), Dept of Electrical and Computer Engineering, Xinchao Wang's lab. Tianbo Pan is a PhD student advised by Xinchao Wang."
+}

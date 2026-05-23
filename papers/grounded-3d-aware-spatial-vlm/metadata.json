@@ -1,0 +1,39 @@
+{
+  "title": "Grounded 3D-Aware Spatial Vision-Language Modeling",
+  "system_name": "GR3D",
+  "authors": [
+    "An-Chieh Cheng",
+    "Yang Fu",
+    "Yatai Ji",
+    "Ligeng Zhu",
+    "Guanqi Zhan",
+    "Zhuoyang Zhang",
+    "Zhaojing Yang",
+    "Song Han",
+    "Yao Lu",
+    "Pavlo Molchanov",
+    "Vidya Nariyambut Murali",
+    "Jan Kautz",
+    "Xiaolong Wang",
+    "Danny Yin",
+    "Sifei Liu"
+  ],
+  "abstract": "GR3D is a spatial vision language model equipped with three complementary grounding capabilities—explicit 2D grounding, implicit 2D grounding, and monocular 3D grounding—within a single framework. The implicit grounding mechanism identifies entity mentions during generation and inserts the corresponding region tokens into the text stream. A region-prompted monocular 3D grounding design predicts 3D bounding boxes in the camera view from grounded region queries, supported by intrinsic-aware normalization and dense geometric supervision. These capabilities let GR3D decompose complex spatial understanding problems into grounded 2D perception followed by 3D inference. The model achieves consistent improvements across grounded and non-grounded spatial benchmarks, demonstrating grounding as an effective inductive bias for strengthening spatial understanding in VLMs.",
+  "year": 2026,
+  "venue": "CVPR 2026 (Poster)",
+  "presentation": "Saturday, June 6, 2026, 10:45 AM - 12:45 PM PDT, ExHall F",
+  "arxiv_id": null,
+  "arxiv_url": null,
+  "pdf_url": null,
+  "doi": null,
+  "published": true,
+  "cvpr_page": "https://cvpr.thecvf.com/virtual/2026/poster/39015",
+  "related_paper": {
+    "title": "3D Aware Region Prompted Vision Language Model",
+    "system_name": "SR-3D",
+    "arxiv_id": "2509.13317",
+    "arxiv_url": "https://arxiv.org/abs/2509.13317",
+    "note": "Earlier related work by same first author (An-Chieh Cheng) and overlapping co-authors. SR-3D connects single-view 2D images and multi-view 3D data via a shared visual token space. GR3D appears to be an extended/newer version with additional grounding capabilities."
+  },
+  "note": "CVPR 2026 论文，会议尚未召开（2026年6月6日），目前无公开 PDF 可下载。无 arXiv 预印本。相关早期工作 SR-3D (arXiv:2509.13317) 由同一第一作者发表，项目页面: https://www.anjiecheng.me/sr3d"
+}

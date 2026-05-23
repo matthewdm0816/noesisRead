@@ -1,0 +1,33 @@
+{
+  "title": "Vid-LLM: A Compact Video-based 3D Multimodal LLM with Reconstruction-Reasoning Synergy",
+  "authors": [
+    "Haijier Chen",
+    "Bo Xu",
+    "Shoujian Zhang",
+    "Haoze Liu",
+    "Jiaxuan Lin",
+    "Jingrong Wang"
+  ],
+  "abstract": "Recent developments in Multimodal Large Language Models (MLLMs) have significantly improved Vision–Language (VL) reasoning in 2D domains. However, extending these capabilities to 3D scene understanding remains a major challenge. Existing 3D Multimodal Large Language Models (3D-MLLMs) often depend on 3D data inputs, which limits scalability and generalization. To address this limitation, we propose Vid-LLM, a video-based 3D-MLLM that directly processes video inputs without requiring external 3D data, making it practical for real-world deployment. In our method, the geometric prior are directly used to improve the performance of the sceen perception. To integrate the geometric cues into the MLLM compactly, we design a Cross-Task Adapter (CTA) module to align the 3D geometric priors with the vision-language representations. To ensure geometric consistency and integrity, we introduce a Metric Depth Model that recovers real-scale geometry from the reconstruction outputs. Finally, the model is fine-tuned with a two-stage distillation optimization strategy, realizing fast convergence and stabilizes training. Extensive experiments across diverse benchmarks verified the effectiveness of our method on 3D Question Answering, 3D Dense Captioning and 3D Visual Grounding tasks, demonstrating the superior multi-task capabilities. Project page: https://chenhaijier.github.io/Vid-LLM/.",
+  "year": 2025,
+  "venue": "ICLR 2026",
+  "arxiv_id": "2509.24385",
+  "arxiv_url": "https://arxiv.org/abs/2509.24385",
+  "pdf_url": "https://arxiv.org/pdf/2509.24385",
+  "doi": "10.48550/arXiv.2509.24385",
+  "published": true,
+  "note": "Published at ICLR 2026. arXiv first submitted 2025-09-29, latest revision (v4) 2026-03-02. Subjects: cs.CV, cs.AI. CC BY 4.0 license. Project page: https://chenhaijier.github.io/Vid-LLM/",
+  "opensource": {
+    "code": [
+      {
+        "url": "https://github.com/chenhaijier/Vid-LLM",
+        "description": "Official GitHub repository (placeholder, code not yet released)",
+        "verified": true
+      }
+    ],
+    "data": [],
+    "model": [],
+    "project_page": "https://chenhaijier.github.io/Vid-LLM/",
+    "summary": "GitHub repo 存在但为 placeholder（仅有 README，代码尚未发布）。HuggingFace checkpoints 和 demo 标记为 Coming Soon。论文承诺将发布完整代码、数据集和预训练权重。"
+  }
+}

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Reading Notes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<style>
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --border: #e7e5e4;
+  --text: #1c1917;
+  --text-secondary: #78716c;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --yellow: #ca8a04;
+  --yellow-bg: #fefce8;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --gray: #a8a29e;
+  --gray-bg: #f5f5f4;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Header */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 1.5rem 1.5rem;
+}
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.header p {
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+}
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.stats .num {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Controls */
+.controls {
+  max-width: 960px;
+  margin: 1.5rem auto 0;
+  padding: 0 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-box:focus { border-color: var(--accent); }
+.filter-btn {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Paper list */
+.paper-list {
+  max-width: 960px;
+  margin: 1.5rem auto 3rem;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.paper-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.paper-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #d6d3d1;
+}
+.paper-card.expanded {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+.paper-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.paper-badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  margin-top: 0.15rem;
+}
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.badge-done { background: var(--green-bg); color: var(--green); }
+.badge-pdf { background: var(--accent-light); color: var(--accent); }
+.badge-pending { background: var(--yellow-bg); color: var(--yellow); }
+.badge-missing { background: var(--gray-bg); color: var(--gray); }
+.badge-venue {
+  background: var(--gray-bg);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.paper-info { flex: 1; min-width: 0; }
+.paper-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+.paper-meta {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+.paper-authors {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.paper-summary {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Links row */
+.paper-links {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.paper-link {
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: var(--gray-bg);
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+.paper-link:hover { background: var(--border); text-decoration: none; }
+
+/* Expanded notes */
+.paper-notes {
+  display: none;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+.paper-card.expanded .paper-notes { display: block; }
+.notes-content {
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+.notes-content h1 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+.notes-content h2 {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.notes-content h3 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+.notes-content p { margin: 0.5rem 0; }
+.notes-content ul, .notes-content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+.notes-content li { margin: 0.25rem 0; }
+.notes-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 1rem;
+  margin: 0.75rem 0;
+  background: var(--accent-light);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+.notes-content code {
+  background: var(--gray-bg);
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+.notes-content pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.notes-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+.notes-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+}
+.notes-content th, .notes-content td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.notes-content th { background: var(--gray-bg); font-weight: 600; }
+.notes-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+.notes-content strong { font-weight: 600; }
+
+/* Toggle hint */
+.expand-hint {
+  font-size: 0.75rem;
+  color: var(--gray);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+.paper-card.expanded .expand-hint .hint-text { display: none; }
+.paper-card:not(.expanded) .expand-hint .collapse-text { display: none; }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+  border-top: 1px solid var(--border);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .header { padding: 1.5rem 1rem 1rem; }
+  .controls { padding: 0 1rem; }
+  .paper-list { padding: 0 1rem; }
+  .paper-top { flex-direction: column; }
+  .paper-badges { order: -1; }
+  .stats { flex-wrap: wrap; gap: 0.75rem; }
+}
+
+/* KaTeX display math */
+.notes-content .katex-display { margin: 0.75rem 0; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>Paper Reading Notes</h1>
+    <p>3D Visual Grounding & Spatial Reasoning</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <input class="search-box" id="search" type="text" placeholder="Search papers...">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="analyzed">Analyzed</button>
+  <button class="filter-btn" data-filter="has-pdf">Has PDF</button>
+  <button class="filter-btn" data-filter="pending">Pending</button>
+</div>
+
+<div class="paper-list" id="paper-list"></div>
+
+<div class="footer">
+  Built from <code>papers/</code> directory &middot; Generated by <code>scripts/build_site.py</code>
+</div>
+
+<script>
+let allPapers = [];
+
+async function loadPapers() {
+  const resp = await fetch('papers.json');
+  allPapers = await resp.json();
+  renderStats();
+  renderPapers(allPapers);
+}
+
+function renderStats() {
+  const total = allPapers.length;
+  const analyzed = allPapers.filter(p => p.has_notes).length;
+  const hasPdf = allPapers.filter(p => p.has_pdf).length;
+  const el = document.getElementById('stats');
+  el.innerHTML = `
+    <span><span class="num">${total}</span> papers</span>
+    <span><span class="num">${analyzed}</span> analyzed</span>
+    <span><span class="num">${hasPdf}</span> with PDF</span>
+    <span><span class="num">${total - analyzed}</span> pending</span>
+  `;
+}
+
+function getStatus(paper) {
+  if (paper.has_notes) return 'analyzed';
+  if (paper.has_pdf) return 'has-pdf';
+  return 'pending';
+}
+
+function renderPapers(papers) {
+  const list = document.getElementById('paper-list');
+  if (!papers.length) {
+    list.innerHTML = '<div class="empty">No papers match your search.</div>';
+    return;
+  }
+  list.innerHTML = papers.map((p, i) => renderCard(p, i)).join('');
+  // Re-render math in visible cards
+  renderMath();
+}
+
+function renderCard(paper, idx) {
+  const m = paper.metadata || {};
+  const title = m.title || paper.slug;
+  const authors = (m.authors || []).join(', ') || 'Unknown';
+  const venue = m.venue || '';
+  const year = m.year || '';
+  const abstract = m.abstract || '';
+  const status = getStatus(paper);
+
+  // Badges
+  let badges = '';
+  if (status === 'analyzed') badges += '<span class="badge badge-done">Analyzed</span>';
+  if (paper.has_pdf) badges += '<span class="badge badge-pdf">PDF</span>';
+  if (status === 'pending') badges += '<span class="badge badge-pending">Pending</span>';
+  if (status !== 'analyzed' && !paper.has_pdf) badges += '<span class="badge badge-missing">No PDF</span>';
+  if (venue) badges += `<span class="badge badge-venue">${venue}</span>`;
+
+  // Summary: use opensource summary or truncated abstract
+  let summary = '';
+  if (m.opensource && m.opensource.summary) {
+    summary = m.opensource.summary;
+  } else if (abstract && abstract !== 'unknown') {
+    summary = abstract.length > 200 ? abstract.slice(0, 200) + '...' : abstract;
+  }
+
+  // Links
+  let links = '';
+  if (m.arxiv_url && m.arxiv_url !== 'unknown') {
+    links += `<a class="paper-link" href="${m.arxiv_url}" target="_blank" onclick="event.stopPropagation()">arXiv</a>`;
+  }
+  if (m.pdf_url && m.pdf_url !== 'unknown') {
+    links += `<a class="paper-link" href="${m.pdf_url}" target="_blank" onclick="event.stopPropagation()">PDF</a>`;
+  }
+  if (m.opensource) {
+    (m.opensource.code || []).forEach(c => {
+      links += `<a class="paper-link" href="${c.url}" target="_blank" onclick="event.stopPropagation()">Code</a>`;
+    });
+    (m.opensource.model || []).forEach(c => {
+      links += `<a class="paper-link" href="${c.url}" target="_blank" onclick="event.stopPropagation()">Model</a>`;
+    });
+    (m.opensource.data || []).forEach(c => {
+      links += `<a class="paper-link" href="${c.url}" target="_blank" onclick="event.stopPropagation()">Data</a>`;
+    });
+    if (m.opensource.project_page) {
+      links += `<a class="paper-link" href="${m.opensource.project_page}" target="_blank" onclick="event.stopPropagation()">Project</a>`;
+    }
+  }
+
+  // Notes
+  let notesHtml = '';
+  if (paper.notes) {
+    notesHtml = `<div class="paper-notes"><div class="notes-content" id="notes-${idx}">${renderMarkdown(paper.notes)}</div></div>`;
+  }
+
+  const noteCount = paper.notes ? '' : '<span style="color:var(--gray);font-size:0.8rem;">No notes available</span>';
+
+  return `
+    <div class="paper-card" data-status="${status}" data-idx="${idx}" onclick="toggleCard(this)">
+      <div class="paper-top">
+        <div class="paper-info">
+          <div class="paper-title">${escHtml(title)}</div>
+          <div class="paper-meta">
+            <span class="paper-authors" title="${escHtml(authors)}">${escHtml(authors)}</span>
+            ${year && year !== 'unknown' ? `<span>${year}</span>` : ''}
+          </div>
+        </div>
+        <div class="paper-badges">${badges}</div>
+      </div>
+      ${summary ? `<div class="paper-summary">${escHtml(summary)}</div>` : ''}
+      ${links ? `<div class="paper-links">${links}</div>` : ''}
+      <div class="expand-hint">
+        ${paper.notes ? '<span class="hint-text">Click to expand notes</span><span class="collapse-text">Click to collapse</span>' : ''}
+      </div>
+      ${notesHtml}
+    </div>
+  `;
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderMarkdown(md) {
+  // Strip the first H1 title (already shown in card)
+  let text = md.replace(/^#\s+.+\n+/, '');
+  return marked.parse(text, { breaks: false, gfm: true });
+}
+
+function toggleCard(el) {
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded')) {
+    // Render math in this card
+    const notesEl = el.querySelector('.notes-content');
+    if (notesEl && window.renderMathInElement) {
+      renderMathInElement(notesEl, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+        ],
+        throwOnError: false,
+      });
+    }
+  }
+}
+
+function renderMath() {
+  if (window.renderMathInElement) {
+    // Only render in visible (expanded) cards
+    document.querySelectorAll('.paper-card.expanded .notes-content').forEach(el => {
+      renderMathInElement(el, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false },
+        ],
+        throwOnError: false,
+      });
+    });
+  }
+}
+
+// Filter
+let activeFilter = 'all';
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+
+document.getElementById('search').addEventListener('input', () => {
+  applyFilters();
+});
+
+function applyFilters() {
+  const query = document.getElementById('search').value.toLowerCase();
+  let filtered = allPapers.filter(p => {
+    // Filter by status
+    const status = getStatus(p);
+    if (activeFilter === 'analyzed' && status !== 'analyzed') return false;
+    if (activeFilter === 'has-pdf' && !p.has_pdf) return false;
+    if (activeFilter === 'pending' && status === 'analyzed') return false;
+
+    // Search
+    if (query) {
+      const m = p.metadata || {};
+      const haystack = [
+        m.title, m.venue, (m.authors || []).join(' '),
+        m.abstract, m.note,
+        p.slug,
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+
+    return true;
+  });
+  renderPapers(filtered);
+}
+
+// KaTeX auto-render wait
+function waitForKaTeX() {
+  if (window.renderMathInElement) {
+    loadPapers();
+  } else {
+    setTimeout(waitForKaTeX, 100);
+  }
+}
+waitForKaTeX();
+</script>
+</body>
+</html>

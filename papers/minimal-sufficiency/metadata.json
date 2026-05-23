@@ -1,0 +1,32 @@
+{
+  "title": "Pursuing Minimal Sufficiency in Spatial Reasoning",
+  "authors": [
+    "Yejie Guo",
+    "Yunzhong Hou",
+    "Wufei Ma",
+    "Meng Tang",
+    "Ming-Hsuan Yang"
+  ],
+  "abstract": "Spatial reasoning, the ability to ground language in 3D understanding, remains a persistent challenge for Vision-Language Models (VLMs). We identify two fundamental bottlenecks: inadequate 3D understanding capabilities stemming from 2D-centric pre-training, and reasoning failures induced by redundant 3D information. To address these, we first construct a Minimal Sufficient Set (MSS) of information before answering a given question: a compact selection of 3D perception results from expert models. We introduce MSSR (Minimal Sufficient Spatial Reasoner), a dual-agent framework that implements this principle. A Perception Agent programmatically queries 3D scenes using a versatile perception toolbox to extract sufficient information, including a novel SOG (Situated Orientation Grounding) module that robustly extracts language-grounded directions. A Reasoning Agent then iteratively refines this information to pursue minimality, pruning redundant details and requesting missing ones in a closed loop until the MSS is curated. Extensive experiments demonstrate that our method, by explicitly pursuing both sufficiency and minimality, significantly improves accuracy and achieves state-of-the-art performance across two challenging benchmarks. Furthermore, our framework produces interpretable reasoning paths, offering a promising source of high-quality training data for future models.",
+  "year": 2026,
+  "venue": "ICLR 2026",
+  "arxiv_id": "2510.16688",
+  "arxiv_url": "https://arxiv.org/abs/2510.16688",
+  "pdf_url": "https://arxiv.org/pdf/2510.16688",
+  "doi": "unknown",
+  "published": true,
+  "note": "Published as a conference paper at ICLR 2026. Authors from Shanghai Jiao Tong University, Beijing Institute of Technology, Johns Hopkins University, and University of California Merced. Code available at https://github.com/gyj155/mssr. Submitted to arXiv v1 on 2025-10-18, revised v2 on 2026-03-05.",
+  "opensource": {
+    "code": [
+      {
+        "url": "https://github.com/gyj155/mssr",
+        "description": "Official implementation of MSSR (Minimal Sufficient Spatial Reasoner), MIT License, 5 commits, includes src/, vggt/, scripts/, dual_agent_viewer.py",
+        "verified": true
+      }
+    ],
+    "data": [],
+    "model": [],
+    "project_page": "",
+    "summary": "官方代码已开源（MIT License），包含完整的双智能体框架、SOG 模块和可视化工具，依赖 GroundingDINO、SAM2、VGGT 等子模块。未提供预训练模型或专用数据集。"
+  }
+}

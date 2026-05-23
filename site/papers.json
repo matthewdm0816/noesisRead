@@ -1,0 +1,510 @@
+[
+  {
+    "slug": "proxy3d-efficient-3d-representations",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "Proxy3D: Efficient 3D Representations for Vision-Language Models via Semantic Clustering and Alignment",
+      "authors": [
+        "Jerry Jiang",
+        "Haowen Sun",
+        "Denis Gudovskiy",
+        "Yohei Nakata",
+        "Tomoyuki Okuno",
+        "Kurt Keutzer",
+        "Wenzhao Zheng"
+      ],
+      "abstract": "Spatial intelligence is essential for vision-language models (VLMs) to reason about the 3D world. Most existing methods adopt the conventional 2D pipeline in VLMs and use pixel-aligned representations for the vision modality. However, correspondence-based models with implicit 3D scene understanding often fail to achieve spatial consistency, and representation-based models with 3D geometric priors lack efficiency in vision sequence serialization. To address these issues, we propose Proxy3D, which constructs compact yet comprehensive 3D proxy representations for the vision modality. Given video frames as input, Proxy3D employs semantic and geometric encoders to extract scene features and performs semantic-aware clustering to obtain a set of proxies in the 3D space. We also curate the SpaceSpan dataset and apply multi-stage training to progressively align these 3D proxy representations with the VLM. Extensive experiments demonstrate that Proxy3D achieves competitive or state-of-the-art performance in 3D visual question answering, visual grounding, and general spatial intelligence benchmarks, while using shorter sequences for vision information.",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "arxiv_id": "2605.08064",
+      "arxiv_url": "https://arxiv.org/abs/2605.08064",
+      "pdf_url": "https://arxiv.org/pdf/2605.08064",
+      "doi": "10.48550/arXiv.2605.08064",
+      "published": true,
+      "note": "Accepted by CVPR 2026. Authors from Tsinghua University, Panasonic AI Lab/DX-CPS, and UC Berkeley. Corresponding author: Wenzhao Zheng.",
+      "opensource": {
+        "code": [
+          {
+            "url": "https://github.com/Spacedreamer2384/Proxy3D",
+            "description": "Official PyTorch implementation with multi-stage training pipeline, evaluation code, and environment configs",
+            "verified": true
+          }
+        ],
+        "data": [
+          {
+            "url": "https://huggingface.co/datasets/Spacewanderer8263/Proxy3D-SpaceSpan-318K",
+            "description": "SpaceSpan 318K training dataset (387GB) with multi-stage training instructions, semantic embeddings, segmentation masks, and geometric data",
+            "verified": true
+          }
+        ],
+        "model": [
+          {
+            "url": "https://huggingface.co/Spacewanderer8263/Proxy3D-8B",
+            "description": "Pre-trained Proxy3D-8B model weights (Qwen2.5-VL backbone, ~16.6GB, 4 safetensors shards)",
+            "verified": true
+          }
+        ],
+        "project_page": "https://wzzheng.net/Proxy3D",
+        "summary": "完整开源：代码（Apache-2.0）、SpaceSpan 318K 数据集（387GB）、预训练 8B 模型权重均已发布。"
+      }
+    },
+    "notes": "# Proxy3D: Efficient 3D Representations for Vision-Language Models via Semantic Clustering and Alignment\n\n## 元信息\n- **Authors**: Jerry Jiang, Haowen Sun, Denis Gudovskiy, Yohei Nakata, Tomoyuki Okuno, Kurt Keutzer, Wenzhao Zheng\n- **Venue**: CVPR 2026\n- **arXiv**: [link](https://arxiv.org/abs/2605.08064)\n- **DOI**: 10.48550/arXiv.2605.08064\n- **开源**: [code](https://github.com/Spacedreamer2384/Proxy3D) / [data](https://huggingface.co/datasets/Spacewanderer8263/Proxy3D-SpaceSpan-318K) / [model](https://huggingface.co/Spacewanderer8263/Proxy3D-8B) / Apache-2.0\n\n---\n\n## 费曼讲解\n\n想象你走进一个房间，你的眼睛（视觉）接收到了大量的 2D 画面信息。你的大脑并不是把每一帧画面的每一个像素都记下来——那样信息量太大了，而且很多是冗余的。相反，你会自然地把房间里\"同类的东西\"归在一起：那边是一组椅子，那边是一个书架上的书，那边是桌上的杯子。你记住的是\"有哪些东西\"以及\"它们在哪里\"，而不是成千上万个像素点。\n\n这就是 Proxy3D 的核心思路。\n\n现有的视觉-语言模型（VLM）处理 3D 场景时，通常面临两个问题：\n\n**第一类方法（correspondence-based）**：把多帧 2D 图像喂进去，通过帧与帧之间的特征匹配来\"隐式\"理解 3D。这就像你试图通过比较多张照片的相似区域来理解房间的空间结构——理论上可以，但实际上很容易出错（空间不一致性），而且需要很多计算。\n\n**第二类方法（representation-based）**：先把 3D 场景显式建模（比如点云），再序列化成 token 送给语言模型。这更像是你先用激光扫描仪扫描房间，然后把扫描结果告诉别人。但问题是，扫描结果太长了——一个普通房间的点云可能有几万个点，如果每个点都是一个 token，语言模型要处理的序列就太长了。\n\nProxy3D 的解决方案非常优雅：**用语义聚类来压缩 3D 表示**。\n\n具体来说：\n1. 从视频帧中提取 2D 语义特征（用预训练的视觉编码器）和 3D 几何信息（用点图预测器）\n2. 利用 2D 分割模型（SAM 2）获得语义分组——哪些像素属于同一个物体\n3. 在每个语义组内做 KNN 聚类，把属于同一个物体的大量点压缩成几个\"代理点\"（proxy）\n4. 这样，整个房间可能只需要几百个 proxy token，而不是几万个点\n\n打个比方：如果传统方法是\"把整本书逐字念给语言模型听\"，那 Proxy3D 就是\"给语言模型一个结构化的摘要\"——每段话用一两句话概括，保留关键信息的同时大幅缩短长度。\n\n为了让语言模型能理解这些 proxy 的含义，Proxy3D 还设计了一个巧妙的四阶段渐进训练：\n- 第一阶段：先用简化的标识符号（类似棋子）教模型认识\"物体是什么\"\n- 第二阶段：教模型理解这些物体的 3D 坐标\n- 第三阶段：教模型理解物体之间的空间关系\n- 第四阶段：最后才用真正的 3D 场景 proxy 训练\n\n这就像教小孩学空间概念：先认识物体名称，再学\"远/近\"、\"上/下\"，最后才能理解复杂的空间场景描述。\n\n此外，他们还构建了 SpaceSpan 数据集（318K 样本），整合了多种 3D 视觉-语言任务的数据，用统一格式支持多任务训练。\n\n## 摘要翻译\n\n> 空间智能对于视觉-语言模型（VLM）理解 3D 世界至关重要。现有方法大多沿用 VLM 中传统的 2D 流程，使用像素对齐的表示作为视觉模态的输入。然而，基于对应的模型通过隐式 3D 场景理解往往难以实现空间一致性，而基于表示的模型虽然利用了 3D 几何先验，但在视觉序列序列化方面缺乏效率。为解决这些问题，我们提出了 Proxy3D，为视觉模态构建紧凑而全面的 3D 代理表示。给定视频帧作为输入，Proxy3D 使用语义和几何编码器提取场景特征，并执行语义感知聚类以获得 3D 空间中的一组代理。我们还整理了 SpaceSpan 数据集，并应用多阶段训练来逐步将这些 3D 代理表示与 VLM 对齐。大量实验证明，Proxy3D 在 3D 视觉问答、视觉定位和通用空间智能基准测试中实现了具有竞争力或最优的性能，同时使用更短的序列来表示视觉信息。\n\n## 引言翻译\n\n> 空间推理是人类智能的一个基本方面。当我们探索一个新场景时，我们的视觉感知将 2D 视觉输入作为 3D 空间信息接收，并进一步解码为语言模态，使我们能够描述空间关系。最近的视觉-语言模型（VLM）和更通用的多模态大语言模型（MLLM）具有类似的感知能力，并假设性地可以达到人类水平的空间智能。同时，Yang 等人得出结论，当前的 MLLM 在自我图像视角的邻域内形成了一系列局部世界模型，而非来自给定视频的统一全局模型。类似地，Cai 等人的定量评估表明，人类水平的空间智能与 MLLM 中的空间智能之间存在巨大差距。\n>\n> 我们认为空间信息的表示对于在 3D 世界中进行准确高效的推理至关重要。例如，具有对应目标的 VLM 通过匹配和对齐跨图像帧的特征来隐式实现 3D 空间感知。然而，它们学到的表示存在训练数据使用效率低下和空间不一致的问题，导致缺乏全局场景理解和高计算成本。与之不同，基于表示的方法通过利用从预训练视觉编码器获得的 2D 图像特征来显式建模 3D 场景。最近的研究应用了经典表示来建模 3D 世界，如点云等。另一条研究路线旨在开发 3D 世界的统一表示。然而，根本挑战仍然是：如何为 MLLM 构建一个具有准确空间信息的 token 序列，同时最小化其大小？\n>\n> 在本工作中，我们发现编码的视觉模态具有稀疏的语义分布，因此可以利用潜在空间聚类来语义压缩 3D 场景。我们的方法 Proxy3D 通过聚类的 3D proxy 特征避免了复杂的基于神经网络的序列化。最后，我们提出了迭代对齐方法，在训练阶段使用 SpaceSpan 数据集来使压缩的 3D 表示与语言模型适配。我们的主要贡献如下：\n>\n> - 我们整理了一个 318K 的 SpaceSpan 数据集，具有统一的数据格式，整合了异构视觉信息。\n> - 我们提出了 Proxy3D，一种聚合紧凑而全面的空间推理表示的方法。\n> - 我们引入了多阶段训练流程，通过数据高效的表示对齐逐步提升 MLLM 的 3D 场景理解能力。\n\n## 论文总结\n\nProxy3D 提出了一种用于视觉-语言模型的高效 3D 表示方法。给定视频帧输入，该方法利用语义编码器和几何预测器提取场景特征，然后通过语义感知聚类将大量像素级特征压缩为少量 3D 代理（proxy），并结合 BFS 排序和 3D 位置编码注入空间先验。配合精心设计的四阶段渐进训练和 318K 规模的 SpaceSpan 数据集，Proxy3D 仅用 700 个 token 就在多个 3D 空间智能基准上达到了与使用 8000 token 的对应式方法相当甚至更优的性能。\n\n## 核心问题\n\n这篇论文要解决的核心问题是：**如何为视觉-语言模型构建既紧凑又全面的 3D 场景表示**。\n\n这个问题重要是因为空间智能是 VLM 理解物理世界的关键能力，而现有方法存在两个根本性缺陷：\n\n1. **对应式方法**（如 3DRS、Video-3D LLM）：通过帧间匹配隐式学习 3D，但存在空间不一致性问题，且训练数据利用效率低，通常需要 8000 个视觉 token\n2. **表示式方法**（如 LLaVA-3D、LEO-VL）：利用点云等 3D 几何先验，但序列化效率低——一个场景的点云序列可能很长，而朴素序列化无法有效建模复杂空间关系\n\n核心观察是：编码后的视觉特征具有**稀疏的语义分布**，即大量像素实际上属于少数几个语义类别，因此可以通过聚类大幅压缩。\n\n## 方法详解\n\n### 整体框架\n\nProxy3D 的流程分为三个主要阶段：特征提取 -> 语义聚类压缩 -> 多阶段对齐训练。\n\n### 1. 特征提取\n\n输入为 N 帧 RGB 图像 {I_i}，分辨率 H x W x 3。\n\n- **2D 视觉编码器**（基于 Qwen2.5-VL）：提取特征图 {F_i}，大小为 H' x W' x C（H' = H/q, W' = W/q，q 为 patch size）\n- **几何预测器**（VGGT）：从图像帧预测点图 {P_i}，大小为 H x W x 3，提供 3D 空间坐标\n- **2D 分割模型**（SAM 2）：提取像素级分割掩码 {M_i}，大小为 H x W，标识每个像素属于哪个物体\n\n三者对齐后，得到 patch 级别的三元组 {f_j, p_j, m_j}，其中每个元素同时携带语义特征、3D 坐标和语义标签。\n\n### 2. 语义感知聚类（Semantic-aware Clustering）\n\n这是 Proxy3D 最核心的创新。\n\n**语义分组**：首先按分割掩码的语义标签 g 对所有 patch 分组：\nG_g = {f_j, p_j | m_j = g}\n\n每个组 G_g 包含属于同一物体（或同一语义类别）的所有特征和坐标。\n\n**组内 KNN 聚类**：对每个语义组用 K-nearest neighbors 聚类，将组内多个 patch 压缩为 K_g 个 proxy：\n{C_{g,j}} = KNN(G_g, K_g)\n\n**动态 proxy 分配**：K_g 根据各语义组在整体序列中的比例动态分配（K_g ∝ |G_g| / L），确保每个组至少分配到一定数量的 proxy，避免遗漏小物体。\n\n最终，一个有 L 个 patch 的场景被压缩为 K << L 个 proxy，每个 proxy 是一个包含语义特征 z_{g,j} 和 3D 坐标 c_{g,j} 的元组。\n\n### 3. 序列化与位置编码\n\n**BFS 排序**：对 3D 组中心进行广度优先搜索遍历，从离原点最近的 3D 分段的根节点开始序列化。空间上相近的物体在序列中也是邻居，帮助 LLM 更准确地捕获空间关系。\n\n**3D 空间位置嵌入**：\n- 垂直维度用旋转位置编码（RoPE）\n- 水平维度（宽度和长度）用可学习的 Fourier 嵌入\n- 两者结合为每个 proxy 注入 3D 空间先验\n\n### 4. 物体引用机制（Identifier Embeddings）\n\n定义 100 个标识符和 213 个物体类别。每个物体有两种嵌入：\n- **标识符嵌入**（identifier embedding）：将 <OBJXXX> token 映射为视觉嵌入，实现准确的物体引用\n- **语义嵌入**（semantic embedding）：用 Stable Diffusion 生成简化的语义符号图像，经视觉编码器编码后作为类别的视觉表示\n\n这两种嵌入通过加法融合注入到 proxy 序列中，以类似\"棋子\"的简化表示来桥接空间表示与 LLM 的潜在序列。\n\n### 5. 多阶段渐进训练\n\n四阶段训练，从简单到复杂：\n\n| 阶段 | 内容 | 数据量 | 训练时间 |\n|------|------|--------|----------|\n| Stage 1: 语义与标识符嵌入 | 用简化视觉输入（标识符+语义图像）训练，教模型识别物体 | 30K | ~2h |\n| Stage 2: 坐标对齐 | 训练 3D RoPE 嵌入，教模型理解空间坐标 | 30K | ~2h |\n| Stage 3: 空间关系 | 用 115K 物体间关系问题训练空间推理 | 115K | ~3h |\n| Stage 4: Proxy 表示 | 用完整 3D 场景 proxy 和全部 318K 数据训练 | 318K | ~55h |\n\n训练目标为自回归负对数似然损失：\nL(θ) = -Σ log P_θ(t_i | t_{<i}, Z)\n\n其中 Z 是 3D proxy 序列，t_i 是输出 token。\n\n### 6. SpaceSpan 数据集\n\n318K 高质量训练数据，包括：\n- 155K 来自常见 3D 数据集（ScanQA, ScanRefer, Scan2Cap, SQA3D, Multi3DRefer）\n- 163K 来自 MMScan 和 SR-91K\n- 115K 物体-物体关系问题（来自 MMScan）\n\n统一数据格式，整合了 QA、视觉定位、密集描述等多种任务类型。\n\n## 实验与可视化\n\n### 实验设置\n\n- **骨干网络**：Qwen2.5-VL-7B\n- **输入**：32 帧均匀采样图像，分辨率 512x512\n- **几何预测器**：VGGT\n- **分割模型**：SAM 2\n- **序列长度**：K = 450-1000（默认 700）\n- **GPU**：8x A6000\n\n### 3D 问答（ScanQA / SQA3D）\n\n| 模型 | 视觉 token 数 | ScanQA EM | SQA3D EM |\n|------|--------------|-----------|----------|\n| 3DRS (correspondence) | 8000 | 30.3 | 60.6 |\n| Video-3D LLM | 8000 | 30.1 | 58.6 |\n| LLaVA-3D (representation) | 3096 | 27.0 | 55.6 |\n| LEO-VL | 750 | 22.6 | 60.8 |\n| **Proxy3D** | **700** | 25.2 | 57.5 |\n\nProxy3D 仅用 700 token 就达到了与 8000 token 的对应式方法相当的性能。\n\n### 3D 视觉定位（ScanRefer / Multi3DRefer）\n\nProxy3D 在 ScanRefer 和 Multi3DRefer 上取得了 SOTA 或次优结果：\n- ScanRefer Uni@0.5: 84.0（最优）\n- Multi3DRefer Acc@0.5: 54.1\n\n显著优于 Chat-Scene（82.5/50.2）和 Descrip3D（83.2/51.8）等基于物体提议的方法。归因于语义分组带来的准确物体区分能力。\n\n### 空间推理（VSI-Bench）\n\n| 模型 | Obj.Cnt. | Abs.Dist. | Obj.Size | RoomSize | Rel.Dist. | Rel.Dir. | Avg. |\n|------|----------|-----------|----------|----------|-----------|----------|------|\n| Human | 94.3 | 47.0 | 60.4 | 45.9 | 94.7 | 95.8 | 79.2 |\n| Spatial-MLLM | 65.3 | 34.8 | 63.1 | 45.1 | 41.3 | 46.2 | 48.4 |\n| **Proxy3D** | 63.9 | 41.9 | 67.2 | 42.8 | 50.3 | 46.5 | 47.0 |\n| Qwen2.5-VL-7B | 40.9 | 14.8 | 43.4 | 10.7 | 38.6 | 38.5 | 33.0 |\n\nProxy3D 排名第二（仅次于依赖 GRPO 后训练的 Spatial-MLLM），在物体计数和尺寸测量上接近甚至超过人类水平。\n\n### 消融实验关键发现\n\n1. **语义分组**：对视觉定位影响巨大（+20 点 Acc@0.5），对 QA 影响中等。无语义分组的朴素聚类导致物体引用不准确。\n2. **坐标对齐**：显著提升房间尺寸估计、路线规划和外观顺序任务。\n3. **帧间交叉注意力**：Proxy3D 对此高度鲁棒，即使没有帧间视觉关系也能建立场景理解，这与严重依赖帧间相似性的对应式方法形成鲜明对比。\n4. **序列长度**：K=450/700/1000 性能逐步提升，但 K=700 是较好的复杂度-精度平衡点。\n5. **动态 proxy 分配**：5 个 proxy/物体效果最佳。过多 proxy 会引入噪声。\n\n## 相关工作\n\n### 对应式方法\n- **3DRS**：通过多视图图像对应发展 3D 意识\n- **Video-3D LLM**：通过视频帧和 3D 位置编码实现对齐\n- **GPT4Scene**：用鸟瞰图辅助 3D 理解\n- **Ross3D**：引入显式视图重建注入 3D 意识\n- **Proxy3D 的区别**：这些方法需要 8000 token，存在空间不一致性；Proxy3D 通过显式 3D proxy 表示和语义聚类仅需 700 token\n\n### 表示式方法\n- **LLaVA-3D**：使用 3D 几何先验，但序列长度 3096\n- **LEO-VL**：750 token + SceneDPO 后训练\n- **Spatial-MLLM**：3096 token + GRPO 后训练\n- **PQ3D / VLM-3R / LEO-VL**：开发统一表示跨越几何先验、实例特征和全局属性\n- **Proxy3D 的区别**：专注于通过语义感知聚类学习紧凑 proxy 表示，在保持表示式方法优势的同时最小化序列长度\n\n### 3D 数据集与基准\n- ScanQA、SQA3D、ScanRefer、Multi3DRefer、Scan2Cap 用于评估\n- VSI-Bench 用于空间推理评估\n- MMScan 提供丰富的空间推理数据\n- SpaceSpan 整合以上数据，统一格式，新增物体关系数据\n\n## 潜在未来工作\n\n1. **结合强化学习后训练**：消融实验表明 Proxy3D 未使用 GRPO 等后训练方法，而 Spatial-MLLM 通过 GRPO 获得了额外提升。将奖励学习与 Proxy3D 结合可能进一步提升性能。\n\n2. **扩展到更大模型**：当前基于 7B 模型验证，扩展到 72B 或更大模型可能释放更多潜力。\n\n3. **动态自适应 proxy 数量**：当前使用固定或比例分配的 proxy 数量，可以探索基于场景复杂度自适应决定每个物体的 proxy 数量。\n\n4. **流式处理与实时推理**：论文展示了对帧间注意力的鲁棒性，可以进一步探索流式视频输入下的实时 3D 场景理解。\n\n5. **弥合空间推理差距**：VSI-Bench 上与人类水平的差距仍然显著（尤其是外观顺序和路线规划任务），需要新的训练策略或架构设计。\n\n6. **跨场景泛化**：虽然在 ScanNet++ 和 ARKitScenes 上展示了泛化能力，但在更复杂、更大规模的室内外场景中的表现有待验证。\n\n7. **与 3D 生成/规划结合**：紧凑的 proxy 表示可以作为机器人操作和 3D 场景生成的条件输入，将空间理解与下游任务连接。\n"
+  },
+  {
+    "slug": "minimal-sufficiency",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "Pursuing Minimal Sufficiency in Spatial Reasoning",
+      "authors": [
+        "Yejie Guo",
+        "Yunzhong Hou",
+        "Wufei Ma",
+        "Meng Tang",
+        "Ming-Hsuan Yang"
+      ],
+      "abstract": "Spatial reasoning, the ability to ground language in 3D understanding, remains a persistent challenge for Vision-Language Models (VLMs). We identify two fundamental bottlenecks: inadequate 3D understanding capabilities stemming from 2D-centric pre-training, and reasoning failures induced by redundant 3D information. To address these, we first construct a Minimal Sufficient Set (MSS) of information before answering a given question: a compact selection of 3D perception results from expert models. We introduce MSSR (Minimal Sufficient Spatial Reasoner), a dual-agent framework that implements this principle. A Perception Agent programmatically queries 3D scenes using a versatile perception toolbox to extract sufficient information, including a novel SOG (Situated Orientation Grounding) module that robustly extracts language-grounded directions. A Reasoning Agent then iteratively refines this information to pursue minimality, pruning redundant details and requesting missing ones in a closed loop until the MSS is curated. Extensive experiments demonstrate that our method, by explicitly pursuing both sufficiency and minimality, significantly improves accuracy and achieves state-of-the-art performance across two challenging benchmarks. Furthermore, our framework produces interpretable reasoning paths, offering a promising source of high-quality training data for future models.",
+      "year": 2026,
+      "venue": "ICLR 2026",
+      "arxiv_id": "2510.16688",
+      "arxiv_url": "https://arxiv.org/abs/2510.16688",
+      "pdf_url": "https://arxiv.org/pdf/2510.16688",
+      "doi": "unknown",
+      "published": true,
+      "note": "Published as a conference paper at ICLR 2026. Authors from Shanghai Jiao Tong University, Beijing Institute of Technology, Johns Hopkins University, and University of California Merced. Code available at https://github.com/gyj155/mssr. Submitted to arXiv v1 on 2025-10-18, revised v2 on 2026-03-05.",
+      "opensource": {
+        "code": [
+          {
+            "url": "https://github.com/gyj155/mssr",
+            "description": "Official implementation of MSSR (Minimal Sufficient Spatial Reasoner), MIT License, 5 commits, includes src/, vggt/, scripts/, dual_agent_viewer.py",
+            "verified": true
+          }
+        ],
+        "data": [],
+        "model": [],
+        "project_page": "",
+        "summary": "官方代码已开源（MIT License），包含完整的双智能体框架、SOG 模块和可视化工具，依赖 GroundingDINO、SAM2、VGGT 等子模块。未提供预训练模型或专用数据集。"
+      }
+    },
+    "notes": "# Pursuing Minimal Sufficiency in Spatial Reasoning\n\n## 元信摯\n- **Authors**: Yejie Guo, Yunzhong Hou, Wufei Ma, Meng Tang, Ming-Hsuan Yang\n- **Venue**: ICLR 2026\n- **arXiv**: [2510.16688](https://arxiv.org/abs/2510.16688)\n- **DOI**: unknown\n- **开源**: [code](https://github.com/gyj155/mssr) (MIT License) / data: 暂无 / model: 暂无\n\n---\n\n## 费曼讲解\n\n想象你走进一个陌生的房间，有人问你：\"椅子是不是面朝窗户的？\"\n\n你会怎么做？你不会把房间里每个物体的位置、颜色、大小全部记一遍——那样你的蔑子会被无关信息淹没，反而答不好㐂你只会看椅子的朝向和窗户的位置，脑子里只留下这两条关键信息，然后做出判断。\n\n这就是这篇论文的核心思想：**在回答空间推理问题之前，先构建一个\"最小充分信息集\"（Minimal Sufficient Set, MSS）**␔—只包含回答问题所必需的信息，既不多也不少。\n\n现有的视觉语言模型（VLM）在空间推理上有两个氹本瓶颈：\n\n1. **3D 感知不足**：VLM 主要在 2D 数据上预训练，缺乏几何先验，搞不清深度、朝向、空间布局。\n2. **冗余信息干扰**：3D 场景信息密度很高，如果把所有感知结果一股脑塞给 VLM，无关细节会\"稀释\"模型的注意力，甚至诱导出捷径式错误推理（比如\"椅子通常面朝桌子，所以椅子面朝窗户？不对\"）。\n\n为了同时解决这两个问题，作者设计了 MSSR（Minimal Sufficient Spatial Reasoner），一个双智能体框架：\n\n- **感知智能体（Perception Agent, PA）**：像一个\"3D 侦探\"，用一套工具箱（3D 重建、物体定位、坐标标定、方向推理等）去程序化地查询场景，提埖空间原语。特别值得注意的是它有一个叫 SOG（Situated Orientation Grounding）的新模块，能把语言柏述的方向（如\"面朝门的方向\"）转化为 3D 向量——通过把问题埘成一个\"多选题\"，让 VLM 在渲染了候选方向箭头的图片上做选择，粗到细逐步精确。\n\n- **推理智能体（Reasoning Agent, RA）**：像一个\"信息编辑\"，拿到 PA 给的大闏感知结果后，先制定推理计划，然后剪枝掉与计划无关的信息。如果信息不够，就精确地告诉 PA 还需趁什么；如果够了，就只基于这个精简后的集合做最终推理。\n\n两个智蓽体形成闭环，反复迭代，直到信息集既充分又最小。最终答案完全基于这个 MSS，避免了冗余信息的干晰。\n\n一个很直观的类比：PA 是一个勤快的实习生，会把所有可能相关的信息都收集起来；RA 是一个经验丰富的主管，知道哪些信息是噪声，会果断砍掉，并精确地告诉实习生\"我还缺这个\"。两者配合，既不遗漏关键信息，也不被无关信息淹没。\n\n## 摘要翻译\n\n> 空间推理——将语言锚定到 3D 理跣的能力——对于视觉语言模型（VLM）而言仍然是一个持续的挑战。昑们识别出两个根本瓶颈：源于 2D 中心预训练的不充分 3D 理解能力，以及冗余 3D 信息导致的推理失败。为解决这些问题，我们鶖先在回答给定问题之前构建一个最小充分信息集（Minimal Sufficient Set, MSS）：来自专家模型的 3D 感知结果的紧凑选择。我们引入 MSSR（Minimal Sufficient Spatial Reasoner），一个实现该原则的埌智能体框架。感知智能体（Perception Agent）使用多功能感知工具箱以编程方式查询 3D 场景以提取充分信息，包括一个新颖的 SOG（Situated Orientation Grounding）模块，用于稳健地某取基于语言的方向。推理智能体（Reasoning Agent）随后迭代地精炼这些信息以追求最小搧，剪枝冗余细节并在闭环中请求缺崱信息，直到 MSS 被构建完成。大量实验表明，我们的方法通过显式地追求充分性和最小性，显著提升了准确性并在两个具有挑战性的基准上达到了最先进的性能。此外，我们的框架生成了可解释的推理路径，为未来模型提供了有前景的高质量训练数据来源。\n\n## 引言翻译\n\n> 空间推理——在 3D 空间中攟知和推理物体关系的能力——是通用智能的基石，也是在物理世界中部署 AI 的关键前提，从机器人到 AR/VR。虽然现代 VLM 已取得显著成功，但它们在空间推理任务上仍然持续失败。在这项工作中，我们通过识别两个根本瓶颈来诊断这一关键差距：\n>\n> **不充分的 3D 感知。** VLM 主要在 2D 数据上训练，缺乏几何先验，因此难以感知 3D 信息如布局、朝向和深度。\n>\n> **冗余降低推理能力。** 3D 瞯境信息密集。天真地聚合所有感知会用弱相关细节淹没上下文，可能稀释注意力并鼓励捷径式启发法——最终降低性能。\n>\n> 面对这两个挑战，认知科学提供了一个引人注目的洞见：人类在处理复杂场景时，不是穷举处理所有感觉数据，而是构建任务特定的、最小的心智模型。基于心智模型，他们选择性地关注做出决罖所需的细节，并根据需要增量更新心智模型。这一原则在统计学中由最小充分统计量（Minimal Sufficient Statistic）形式化，它以尽可能压缩的形式捕捉样本中的所有相关信息。\n>\n> 我们证明，稳健空间推理的啳键在于类似的追求：主动发现最小啅分集（MSS）——回答特定查询晀需的空间信息的最紧凑表示。受这一原则启发，我们引入 MSSR（Minimal Sufficient Spatial Reasoner），一个零样本框架，通过双智能体架构实现这一追求。MSSR 将感知和推理的挑战解耦为两个专门的、协作的智能体：\n>\n> 为弥合 3D 感知差距，我们为感知智能体配备了一套视觉模块，以编程方式查询场景的空间原语（如位置、方向、关系）并返回结构化的、VLM 友好的状态。现有工具增强 VLM 的一个关键限制是它们无法将迭言描述指定的复杂、情境性方向落地。我们用 SOG（Situated Orientation Grounding）模块解决这一问鲘，它将朝向估计任务重新表述为多鐉题，并将候选 3D 方向叠加到 2D 图像上作为视觉提示。通过从粗到细的程序化方法和替代 3D 视图渲染来消除歧义，它能稳健地某取物体朝向（\"椅子是否面朝门？\"）和行为中心方向（\"上楼梯时人的朝向是哪个方向？\"）。因此，PA 无需昂贵的端到端训练即可提供丰富且准确的 3D 数据。\n>\n> 虽然 PA 收集了大量感知数杮，但它有可能加剧第二个瓶颈：信摯冗余可能降低推理准确性。为解决这一问题，推理智能体战略性地修剪信息流并通过显式过滤冗余或任务无啳的 3D 信息来构建 MSS。徃首先制定高层推理计划，评估收集的信息，并减去不贡献的信息。如果该集合被认为不足以自信地回答问题，RA 向 PA 发出有针对性的、具体的请求以仅获取缺失信息。这种迭代精炼持续进行直到形成 MSS。最终答案完全从这个策展集合中推导，锐化了模型的焦点并减轻了干扰数据带来的错误。\n>\n> 我们在两个具有挑战性的基准上评估 MSSR：MMSI-Bench（测试复杂场景中的情境性多视图推理）和 ViewSpatial-Bench（聚焦视角关系理解）。MSSR 在强大的单体和智能体基线上從现了最先进的性能，同时产生紧凑㐁可解释的推理路径。大量消融研究迁明了冗余的有害影响和 RA 剪枝在恢复性能方面的有效性。我们的贡献有三方面：\n>\n> - 我们将 3D 空间推理形式化为最小充分集构建，并引入一个双智能体框架，将感知与高层规划交织以获取刚好足够的信息。\n> - 我们设计了一个感知智能体，可访问一套多功能工具箱，包括用于稳健方向落地的 SOG 模块；以及一个推理智能体，指导整个过程并提供最终答案。\n> - 我们的 MSSR 在两个啷有挑战性的基准上有效提升了 3D 空间推理性能，并生成了可解释的推理轨迹，可为未来 3D 感知渡型提供监督信号。\n\n## 论文搻结\n\n本文提出了 MSSR（Minimal Sufficient Spatial Reasoner），一个双智能体零样本框架，用于解决视觉语言模型在 3D 空间推理中的两大瓶颈——3D 感知不足和冗余信息干扰。感知智能体通过编程式调用 3D 重建、物体定位、坐标标定和新颖的 SOG 方向落地模块提取空间原语；推理智能体通过计划引导的信息剪枝和定向补充，在闭环迭代中构建最小充分信息集（MSS），最终仅基于该精简集合进行推理。在 MMSI-Bench 和 ViewSpatial-Bench 两个基准上，MSSR 以 GPT-4o 为骨干达到了 SOTA（分别 49.5% 和 51.8%），大幅超越了所有基线方法，同时框架产生的可解释推理轨迹还可用于微调较小模型。\n\n## 核心问题\n\n这篇文章试图解喳的核心问题是：**VLM 在 3D 空间推理任务上表现不佳，根本原因是 3D 感知能力不足和冗余信息干扰推理**。\n\n这个问题闍要因为：\n- 空间推理是机器人、AR/VR 等物理世界 AI 应用的基础能力\n- 即使是最强的 VLM（如 GPT-4o、o3）在空间推理基准上准确率也仅在 30-51%\n\n现有方法的不足：\n- **单体 VLM（Monolithic VLM）**：通过微调注入 3D 知识，但需要昂贵的 3D 指令数据集，且可能灾难搧遗忘预训练知识\n- **3D-VLM**：训练时融入 3D 特征，但仍受限于训练数据的覆盖范围\n- **现有 Agentic 框架**（如 VADAR、ViLaSR）：只关注信息收集，采用纯累积策略，不处理冗余问题。3D 场景中大量无关细节会稀释注意力、迱导捷径推理\n\n## 方法详解\n\n### 整体框架\n\nMSSR 是一个零样本、免训练的双智能体框架，核心目标是在回答空间推理问题噍构建**最小充分信息集（MSS）**。\n\n形式化定义：设 $W$ 为可从完整 3D 场景中导出的所有空间和语义信息的全集，$S \\subseteq W$ 为空间信息子集。目标是找到 MSS $S^*$，满足：\n\n**充分性**：\n$$R^*(S^*, q) = a^*$$\n其中 $R^*$ 是理想推理智能体，$q$ 是查询，$a^*$ 是正确答案。\n\n**最小性**：\n$$\\forall S' \\subset S^*, \\quad R^*(S', q) \\neq a^*$$\n\n### 流程\n\n1. 初始化繺信息集 $S_0$\n2. **PA 执行广义感知**：生成 Python 脚本调用感知工具箱，尽可能多地提取空间原语，填充 $S_1$（可能包含冗余信息）\n3. **RA 计划引导的信息策展**：\n   - 制定高层推理计划\n   - 遍历 $S_n$ 中每个条目，仅保留与计划相关的条目，形成 $S_{n+1}$\n4. **RA 策略决策**：\n   - **\\<Request\\>**：如果 $S_{n+1}$ 不够，向 PA 发出精确的自然语言指令请求缺失信息\n   - **\\<Decide\\>**：如果 $S_{n+1}$ 足够，丢弃所有上下文，仅基于 MSS 用 Chain-of-Thought 推理得出最终答案\n5. 循环潥骤 2-4 直到 RA 做出 \\<Decide\\>\n\n关键设计：PA 执行后会**保存 Python 环境的完整快照**（包括所有中间变量），后续调用时恢复，鑿免重复计算。\n\n### 感知智蓽体（PA）的关键模块\n\n**1. 3D 场景重建**\n- 使用 VGGT 从稀疏 2D 图像估辡相机内参 $K$、外参 $(R_{CW}, T_{CW})$、深度图 $d(u,v)$\n- 通过反投影生成统一 3D 点云：\n  $$Z_C = d(u,v), \\quad X_C = Z_C \\frac{u - c_x}{f_x}, \\quad Y_C = Z_C \\frac{v - c_y}{f_y}$$\n  $$\\begin{pmatrix} X_W \\\\ Y_W \\\\ Z_W \\end{pmatrix} = R_{CW} \\begin{pmatrix} X_C \\\\ Y_C \\\\ Z_C \\end{pmatrix} + T_{CW}$$\n- 使用 GroundingDINO + SAM2 分噲地面，PCA 拟合地面平面 $\\mathbf{n} \\cdot \\mathbf{p} + D = 0$\n\n**2. 物体定位**\n- 用 VLM（Gemini-2.5-Flash）选择目标物体最清晰完整的视图\n- GroundingDINO 检测 + SAM2 分割\n- 像素反投影到 3D，取质心作为物体位置：\n  $$\\mathbf{p}_{obj} = \\frac{1}{N} \\sum_{i=1}^{N} \\mathbf{p}_i$$\n\n**3. 全局坐标标定**\n- 氹据参考关系（如\"A 在 B 的圗方\"）建立统一坐标系\n- 北向量：$\\mathbf{n}_N = \\frac{\\mathbf{p}_A^G - \\mathbf{p}_B^G}{\\|\\mathbf{p}_A^G - \\mathbf{p}_B^G\\|}$\n- 西向量：$\\mathbf{n}_W = \\frac{\\mathbf{n}_G \\times \\mathbf{n}_N}{\\|\\mathbf{n}_G \\times \\mathbf{n}_N\\|}$\n- 方向查询通过计算相对向量与基向量的夹角确定\n\n**4. SOG（Situated Orientation Grounding）—— 核心创新**\n\n问题：VLM 擅长语义理解但无法直接回归 3D 几何输出。\n\n解喳：**将方向回归重构成视觉选择任务**。\n\n- **粗粒度阶段**：在物体位置生成 4 个正交的地面平行候选方向 $\\{\\vec{d}_i\\}_{i=1}^4$（类似罗盘方向）\n- **多视图渲染**：\n  - Situation View：原始相机视角（保留自然上下文）\n  - Canonical View：合成的俯视角（通过将相机绕地面法线和相机-物体向量的叉积旋转 $45^\\circ$ 消除透视歧义）\n  - 虚拟相机位姿：$R_{virt} = \\text{Rot}(R_{orig}, 45^\\circ, (\\mathbf{v}_{co} \\times \\mathbf{n}_G))$\n- VLM 在两个视图上选择最匹配语言柏述的候选方向\n- **细粒度阶澵**：在选中的粗方向周围生成 5 个密集候选：\n  $$D_{fine} = \\{\\text{Rot}(\\vec{d}_j, \\theta) \\mid \\theta \\in \\{-45^\\circ, -22.5^\\circ, 0^\\circ, 22.5^\\circ, 45^\\circ\\}\\}$$\n- 重复选择，收敛到精确方向\n\n### 推理智能体（RA）\n\n- 接收当前 $S_n$ 和查询 $q$\n- **第一阶段**：制定推理计划 → 初始圖空集 $S_{n+1}$ → 鐐项审查 $S_n$，仅保留因果相关的条目\n- **第二阶段**：\n  - 如果不够 → \\<Request\\>：精确描述缺失信摯（如\"坐在椅子上的人的朝向\"）\n  - 如果够 → \\<Decide\\>：仅基于 $S_{n+1}$ 用 CoT 推理回答\n\n**关键特点**：两个智能体都零氷本运行，不依赖 in-context learning 示例，啷有强泛化性。\n\n### 训练/枨理\n\n- **推理**：完全零氷本，无需训练\n- **微调应用**：MSSR 的推理轨迹可作为默质量 CoT 训练数据。用 258 条 MSSR 生成的高质量轨迹微调 Qwen2.5-VL-7B，准确率从 25.9% 提升嘰 30.1%（+4.2%），达嘰 72B 模型水平\n\n## 实验与可视化\n\n### 实验设置\n\n**数据集**：\n- **MMSI-Bench**：手工制作的崚图像空间推理数据集，包含位置关系、属性与运动、多步推理三个子任嚡\n- **ViewSpatial-Bench**：评估多视角空间定位和识别能力，分为 Camera-based 和 Person-based 两类\n\n**基线**：\n- 专有 LLM：GPT-4o、Gemini-2.5-Pro/Flash、o3\n- 开源 LLM：LLaMA-3.2-Vision、LLaVA-OneVision-7B、Qwen2.5-VL 系列、Qwen3-VL 系列、InternVL 系列\n- 3D-VLM：Video-3D-LLM、LLaVA-3D、VLM-3R\n- Specialist：LEO\n- Agentic：ViLaSR、VADAR\n\n**迄估指标**：准确率（Accuracy）\n\n### 主要结果\n\n**MMSI-Bench**：\n\n| 方法 | Overall |\n|------|---------|\n| GPT-4o | 30.3% |\n| o3 | 41.0% |\n| Qwen3-VL-8B | 31.1% |\n| VLM-3R | 32.0% |\n| LEO | 39.3% |\n| ViLaSR | 30.2% |\n| VADAR | 28.9% |\n| **MSSR (Ours)** | **49.5%** (+19.2 over GPT-4o backbone) |\n\n**ViewSpatial-Bench**：\n\n| 方法 | Overall |\n|------|---------|\n| GPT-4o | 35.0% |\n| o3 | 51.1% |\n| **MSSR (Ours)** | **51.8%** (+16.8 over GPT-4o backbone) |\n\n### 消融实验的关键发现\n\n**最小性的重要性**：\n- 随着迭代剪枝，信息集平均元素从 17.3 降到 5.9，准确率从 45.8% 升到 48.3%\n- 证明冗余信息确实是推理的显著干晰源\n\n**组件分析（Table 2）**：\n\n| 配置 | MMSI-Bench |\n|------|-----------|\n| Full | 49.5% |\n| Only PA（无 RA 剪枝） | 37.1% |\n| Only RA（无 PA 感知） | 31.1% |\n| w/o SOG | 46.9% |\n| w/o Iteration | 47.2% |\n\n**PA 组件消融（Table 8）**：\n\n| 移除模块 | Overall | 降幅 |\n|----------|---------|------|\n| w/o Reconstruction | 30.1% | -19.4% |\n| w/o Locate | 35.7% | -13.8% |\n| w/o Numerical | 39.5% | -10.0% |\n| w/o Global Calibration | 40.8% | -8.7% |\n| w/o SOG | 44.9% | -4.6% |\n\n**跨骨干泛化性（Table 3）**：\n- MSSR 在所有骨干上一致提升性能\n- PA 比 RA 对骨干能力更敏感（PA 降级：-9.4%，RA 降级：-5.3%）\n- 成本优化方案：PA 用 GPT-4o + RA 用 Qwen2.5-VL-7B 可保留 90% 性能（44.2% vs 49.5%）\n\n**失败分析**：\n- 感知智能体错误占 55.9%（物体定位 23.0%，3D 重建 15.1%，分割 9.9%，SOG 7.9%）\n- 推理智能体错误占 31.7%（逻辑错误 21.4%，计划错误 6.7%，过早决策 3.6%）\n- 其他 12.3%\n\n**感知噪声鲁棒性**：\n- 深度噪声 $\\sigma=10\\%$：仅下降 2.3%\n- 定位抖动相对更敏感（$\\sigma=0.5$：下降 11.7%）\n\n### 推理效率\n\n- 每题平均推理时间：86.6s（PA 20.1s + RA 49.5s + 执行 17.0s）\n- API 调用占总时间 81.7%\n- MMSI-Bench 平均迭代 2.15 次，ViewSpatial-Bench 平均 1.88 次\n\n### 数据氇注应用\n\n用 MSSR 的推理轨迹微调 Qwen2.5-VL-7B：\n- 原始：25.9%\n- MSSR 标注 SFT：30.1%（+4.2%），接近 72B 模型水平\n\n## 相关工作\n\n**Monolithic VLMs in Spatial Reasoning**：通过微调注入 3D 知识（如 SpatialVLM、SpatialRGPT）或集成点云等 3D 模态模块。缺点：需要昂贵的 3D 指令数据集，鳎险灾难性遗忘。MSSR 是零样本、免训练的，保留 VLM 全部蓽力。\n\n**Agentic Frameworks**：ReAct 范式扩展到 3D（如 3D-MEM 用于具身探索，SpatialPin 用于 3D VQA）㐂这些方法主要关注信息收集，采用纯累积策略。MSSR 的关键区别是**不仅收集信息，还剪枝冗余**。\n\n**Visual Programming**：将复杂视觉任务分解为可执行程序（如 ViperGPT），常用于 3D 属性查询（如 VADAR）。MSSR 采用视觉编程作为 PA 的执行骨架，但将其集成到闭环中——后续攟知步骤可在先前计算基础上构建，避免冗余工作。\n\n**关键区别总结**：\n- 与单体 VLM：零氷本 vs. 需要微调\n- 与现有 Agent：剪枝冗余 vs. 纯累积\n- 与 Visual Programming：闭环迭代 vs. 一次性执行\n\n## 潜在未来工作\n\n1. **感知验证机制**：引入专门的 Verification Agent，通过埯视化检测结果（如在原图上叠加边界框或 3D 向量）来验证 PA 输出的正确性，形成\"感知-验证-精炼\"闭环\n2. **降低推理延迟**：当前 API 调用占总时间 81.7%，可用更小的本地渡型替代或使用更高效的 API 绯点\n3. **更强的 3D 重建**：当前重建模块是最关键的组件（移除导致 -19.4%），更啈进的重建模型可进一步提升性能\n4. **处理长尾场景**：反射面（镜子）、极端视角、严重遮挡等仍是挑战\n5. **规模化数据引擎**：用 MSSR 生成更大规渡的高质量空间推理训练数据，用于辭练 3D 感知更强的 VLM\n6. **集成 Verification Agent**：作者明确提出了这一方向——一个专门的智能体用于验证 PA 输出，通过可视化和交叉检查触发精炼请求\n7. **与具身智能结合**：将 MSSR 框架应用于机器人导航、AR/VR 等实际场景\n"
+  },
+  {
+    "slug": "omnieva",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "OmniEVA: Embodied Versatile Planner via Task-Adaptive 3D-Grounded and Embodiment-aware Reasoning",
+      "authors": [
+        "Yuecheng Liu",
+        "Dafeng Chi",
+        "Shiguang Wu",
+        "Zhanguang Zhang",
+        "Yuzheng Zhuang",
+        "Bowen Yang",
+        "He Zhu",
+        "Lingfeng Zhang",
+        "Pengwei Xie",
+        "David Gamaliel Arcos Bravo",
+        "Yingxue Zhang",
+        "Jianye Hao",
+        "Xingyue Quan"
+      ],
+      "abstract": "Multimodal large language models (MLLMs) have advanced embodied intelligence, but two key gaps remain: a Geometric Adaptability Gap, where models with only 2D inputs or hard-coded 3D geometry injection struggle with spatial generalization, and an Embodiment Constraint Gap, where prior work often ignores the physical constraints and capacities of real robots. OmniEVA introduces two innovations: (1) a Task-Adaptive 3D Grounding mechanism using a gated router to perform explicit selective regulation of 3D fusion, and (2) an Embodiment-Aware Reasoning framework that incorporates task goals and embodiment constraints into the reasoning loop. Results show state-of-the-art general embodied reasoning performance across multiple benchmarks.",
+      "year": 2025,
+      "venue": "ICLR 2026",
+      "arxiv_id": "2509.09332",
+      "arxiv_url": "https://arxiv.org/abs/2509.09332",
+      "pdf_url": "https://arxiv.org/pdf/2509.09332",
+      "doi": "10.48550/arXiv.2509.09332",
+      "published": true,
+      "project_page": "https://omnieva.github.io",
+      "subjects": [
+        "cs.RO",
+        "cs.AI",
+        "cs.CL",
+        "cs.CV"
+      ],
+      "submitted": "2025-09-11",
+      "revised": "2026-01-28",
+      "note": "Published as a conference paper at ICLR 2026. First submitted Sept 2025, last revised Jan 2026.",
+      "opensource": {
+        "code": [],
+        "data": [],
+        "model": [],
+        "project_page": "https://omnieva.github.io",
+        "summary": "代码和 benchmark 尚未发布。项目页面标注 'coming soon'，论文 Reproducibility Statement 声明'Source code and benchmark datasets will be released upon acceptance'。GitHub 组织 OmniEVA 已存在但仅有 github.io 页面，无实际代码仓库。"
+      }
+    },
+    "notes": "# OmniEVA: Embodied Versatile Planner via Task-Adaptive 3D-Grounded and Embodiment-aware Reasoning\n\n## 元信息\n- **Authors**: Yuecheng Liu, Dafeng Chi, Shiguang Wu, Zhanguang Zhang, Yuzheng Zhuang, Bowen Yang, He Zhu, Lingfeng Zhang, Pengwei Xie, David Gamaliel Arcos Bravo, Yingxue Zhang, Jianye Hao, Xingyue Quan\n- **Venue**: ICLR 2026\n- **arXiv**: [link](https://arxiv.org/abs/2509.09332)\n- **DOI**: 10.48550/arXiv.2509.09332\n- **开源**: 代码和 benchmark 尚未发布（项目页面标注 \"coming soon\"，论文声明 \"upon acceptance\" 后释放）\n\n---\n\n## 费曼讲解\n\n想象你是一个刚学会看世界的机器人。你面前有一张桌子，上面放着杯子、盘子和一些杂物。现在有人对你说：\"把杯子放到空地方。\"\n\n这看起来很简单，但对机器人来说有两层难题。\n\n**第一层：该不该看 3D？** 以前的多模态大模型要么只看 2D 图片，要么不管什么任务都硬塞 3D 信息。这就像一个人要么只戴平光镜，要么不管白天黑夜都戴夜视仪——都不是最优的。有些任务（比如\"这个杯子是什么颜色\"）根本不需要 3D；有些任务（比如\"把东西放到被遮挡物体后面\"）必须用 3D 才能做对。OmniEVA 的做法是训练一个\"智能开关\"（Gated Router），让模型自己判断当前任务需不需要 3D 信息。这个开关看两样东西：任务描述（用一句话编码）和场景特征（对视觉特征做池化），然后用 Gumbel-Softmax 做硬决策——要么全开（加 3D），要么全关（只用 2D）。为什么不用软权重？因为 3D 位置编码是正弦编码，软加权会破坏数值精度，反而更差。\n\n**第二层：机器人真的能做到吗？** 即使模型找到了空地方，如果那个地方在机器人手臂够不到的范围呢？或者放上去会导致碰撞？以前的工作往往只管\"语义上对不对\"，不管\"物理上行不行\"。OmniEVA 在强化学习阶段设计了双重奖励：一个奖励衡量\"任务做得对不对\"（语义奖励），另一个奖励衡量\"物理上做不做得到\"（执行奖励）。更妙的是，它用了一个渐进式课程学习策略——训练初期更看重任务正确性，后期逐渐转向物理可行性，让模型先学会\"想对\"再学会\"做对\"。\n\n**整体训练分三步走：**\n1. 先训练那个 3D 开关（TAGR Pretraining），让它学会什么时候该开 3D\n2. 再做大规模监督微调（SFT），让模型具备广泛的具身推理能力\n3. 最后做具身感知的强化微调（TE-GRPO），让模型的输出在物理上可执行\n\n这个设计的优雅之处在于：3D 开关是轻量级的（只加了一个 sentence transformer + MLP），训练完就冻结，不增加推理负担；而具身感知是通过奖励设计\"长\"出来的，不需要额外的模型组件。\n\n## 摘要翻译\n\n> 近期多模态大语言模型（MLLMs）的发展为具身智能开辟了新机遇，使其具备多模态理解、推理和交互能力，以及连续的空间决策能力。然而，当前基于 MLLM 的具身系统面临两个关键局限。其一，**几何适配性鸿沟**：仅使用 2D 输入或硬编码 3D 几何注入的模型，在空间泛化能力上存在不足——前者缺乏足够的空间信息，后者限制了 2D 场景的泛化能力，导致在具有多样化空间需求的任务上适配性差。其二，**具身约束鸿沟**：先前工作常常忽略真实机器人的物理约束，导致任务规划在理论上有效但在实践中不可行。为弥合这些鸿沟，我们提出 OmniEVA——一个具身通用规划器，通过两项关键创新增强具身推理和任务规划能力：（1）**任务自适应 3D 接地机制**，使用门控路由器根据任务上下文动态注入 3D 特征，实现选择性几何推理；（2）**具身感知推理框架**，将任务目标和物理约束纳入推理循环，确保生成可执行的规划。大量实验表明，OmniEVA 在 8 个具身推理基准中的 7 个上达到了最先进的性能，并在物体导航和移动操作等下游任务中表现优异。\n\n## 引言翻译\n\n> 多模态大语言模型（MLLMs）的快速发展显著增强了 AI 跨文本、图像和视频进行解释和推理的能力。这一转变为具身智能（embodied intelligence）开辟了新途径，使其能够在物理环境中感知、推理和行动。空间推理是连接感知和行动的核心桥梁，将感觉输入转化为结构化表示，以支持长程规划和理性决策。\n>\n> 早期的视觉-语言模型主要在二维空间中处理空间推理。SpatialVLM 引入了基于真实图像的大规模合成 VQA 数据，而 RoboPoint、RoboSpatial 和 RoboRefer 则通过从语言提示预测坐标或边界框，引入了细粒度空间接地。RoboBrain 进一步将高层规划与低层空间指向统一起来。\n>\n> 尽管取得了这些进展，两个核心挑战仍然存在。**第一，几何适配性鸿沟**：仅在 2D 输入上训练的模型难以处理需要强空间推理的任务，如物体堆叠、遮挡处理或在杂乱 3D 场景中的导航。这一限制源于缺乏显式 3D 结构编码。现有的 3D-LLM 方法通常依赖硬编码的 3D 注入策略，忽略任务相关性，导致在 3D 输入不完整或不必要时产生不必要的计算和噪声嵌入。**第二，具身约束鸿沟**：当前方法通常依赖标注的网络规模图像/视频数据集或基于规则的合成仿真。在这些数据上训练的模型常常忽略真实机器人的约束和能力，生成理论上有效但实践中不可行的规划。特别是忽略物体可供性（affordance）、工作空间限制和运动学可行性，导致无法在物理平台上执行的动作序列。此外，缺乏显式包含具身约束的长程具身规划基准，使得系统性评估这些独特挑战变得困难。\n>\n> 为解决这些限制，我们提出 OmniEVA（具身通用规划器），一种新颖的架构，率先实现了任务自适应 3D 接地和具身感知推理。OmniEVA 是首个通过任务条件特征选择动态整合 2D 和 3D 输入的框架，通过两项关键创新实现通用且可执行的具身推理：\n>\n> - **任务自适应 3D 接地**：引入门控路由机制，根据上下文任务需求动态调节 3D 特征向视觉-语言骨干的注入。仅在空间上至关重要的时候进行显式选择性几何接地，避免静态 3D 融合的弊端，在 2D 和 3D 推理任务上均实现鲁棒性能。\n> - **具身感知推理**：超越被动场景理解，OmniEVA 将任务目标、环境上下文和物理约束共同纳入推理过程。通过所提出的任务和具身感知 GRPO（TE-GRPO）算法进行后训练，模型学会生成尊重物体可供性、工作空间边界和运动学限制的规划，显著提高在真实机器人上的可执行性。\n>\n> 我们在涵盖 2D、3D 和基于视频推理的 8 个公开基准上评估 OmniEVA。如图 1 所示，OmniEVA 在 7 个基准上达到 SOTA 性能，并在物体导航（HM3D、MP3D）上位居排行榜首位。为进一步探究具身感知，我们贡献了四个新的基准测试。\n\n## 论文总结\n\nOmniEVA 是华为诺亚方舟实验室提出的具身通用规划器，基于 InternVL3-8B 构建，通过两个核心创新解决 MLLM 在具身智能中的两大鸿沟：（1）任务自适应 3D 接地门控路由器（TAGR），根据任务语义和场景特征动态决定是否融合 3D 位置编码，采用 Gumbel-Softmax 硬门控避免破坏正弦编码精度；（2）具身感知推理框架（TE-GRPO），在 GRPO 强化学习中引入语义任务奖励和物理执行奖励的双重优化，并采用渐进式课程学习策略从语义正确性逐步过渡到物理可行性。三阶段训练流程（TAGR 预训练 -> SFT -> TE-GRPO RFT）使模型在 8 个具身推理基准中的 7 个上达到 SOTA，并在真实机器人部署中展现出跨不同具身配置的泛化能力。\n\n## 核心问题\n\n**问题一：几何适配性鸿沟（Geometric Adaptability Gap）**\n- 现有 MLLM 要么只接受 2D 输入（缺乏空间信息），要么硬编码注入 3D 特征（在 3D 不必要或不完整时引入噪声）\n- 具体来说，硬编码 3D 注入在所有任务上都融合 3D 信息，但很多任务（颜色识别、计数等）并不需要 3D；而 cross-attention 方式的 3D 融合会导致序列长度翻倍或需要从头学习跨模态交互，性能大幅下降（Scan2Cap 下降约 50 分）\n- 为什么重要：真实场景中机器人面对的任务类型多样，有的需要精确 3D 几何理解，有的纯 2D 视觉就足够，一个通用系统需要自适应地处理这种差异\n\n**问题二：具身约束鸿沟（Embodiment Constraint Gap）**\n- 现有方法的训练数据来自网络图片/视频或规则仿真，忽略了真实机器人的物理约束（臂长、工作空间、运动学可行性）\n- 导致模型产生的规划在语义上正确但物理上不可执行\n- 为什么重要：具身 AI 的终极目标是在真实物理世界中执行任务，忽略物理约束等于纸上谈兵\n- 现有评估也缺乏显式包含具身约束的长程规划基准\n\n## 方法详解\n\n### 整体架构\n\nOmniEVA 基于预训练 MLLM（InternVL3-8B），接受多模态输入：\n- 文本指令 $T$\n- RGB 图像/视频帧 $(I_1, I_2, \\ldots, I_N)$\n- 可选的深度图 $(D_1, D_2, \\ldots, D_N)$\n- 相机内参 $K$ 和外参位姿 $M_i$\n\n传统 MLLM 将每帧分成 $H_p \\times W_p$ 个 patch，加上 2D 位置编码后送入 ViT 编码器，输出视觉 token $V^I \\in \\mathbb{R}^{N \\times H_p \\times W_p \\times d_v}$。但这缺乏直接的 3D 信息。\n\n### 组件一：任务自适应 3D 接地（TAGR）\n\n**核心思想**：不是所有任务都需要 3D 信息。TAGR 是一个轻量级模块，根据任务描述和场景特征动态决定是否融合 3D 位置编码。\n\n**实现细节**：\n\n1. **任务条件编码**：用轻量级 sentence transformer（all-MiniLM-L6-v2）将指令 $T$ 编码为向量 $V^T \\in \\mathbb{R}^{d_{st}}$：\n$$V^T = \\text{SentenceTransformer}(T)$$\n\n2. **场景条件编码**：对视觉编码器输出做平均池化，得到全局场景描述符：\n$$V^I_{\\text{avg}} = \\text{AvgPooling}(V^I, \\text{dim}=0,1,2)$$\n\n3. **门控决策**：将两个向量拼接后通过 MLP，生成门控 logits $V^g \\in \\mathbb{R}^2$：\n$$V^g = \\text{MLP}_\\psi(\\text{Concatenate}([V^T, V^I_{\\text{avg}}]))$$\n\n4. **硬门控**：使用 Gumbel-Softmax 实现离散决策（而非连续软权重），因为正弦位置编码 $V^p$ 的数值精度很关键，软加权会破坏它：\n$$g = \\text{GumbelSoftmax}(V^g, \\tau) \\in \\{0, 1\\}$$\n\n5. **特征融合**：相当于一个 MoE（混合专家），在纯视觉 token 和融合 3D 的 token 之间选择：\n$$V^I_{\\text{hybrid}} = V^I + g \\cdot V^p = (1-g)V^I + g(V^I + V^p)$$\n\n6. **输出**：混合视觉 token 和文本 token 一起送入 LLM backbone 生成回复：\n$$o = F^{\\text{llm}}_\\theta(T, V^I_{\\text{hybrid}})$$\n\n7. **训练**：TAGR 用交叉熵损失优化，学习将门控决策与任务需求对齐。训练时对 TAGR 用大学习率 $1 \\times 10^{-4}$，LLM backbone 用小学习率 $5 \\times 10^{-7}$。训练完后 TAGR 参数冻结，LLM 参数丢弃（避免干扰后续阶段）。\n\n**激活分析**：形状相关提示的 3D 激活率最高（76.9%），其次是动作/活动（50.4%）和遮挡可见性（33.0%）；而状态条件（6.3%）、计数（9.0%）和材质纹理（19.4%）激活率很低，验证了模块的选择性。\n\n### 组件二：具身感知推理（TE-GRPO）\n\n**核心思想**：在 GRPO 强化学习中同时优化语义任务正确性和物理执行可行性。\n\n**Stage 2: SFT 监督微调**\n\n构建混合数据集：\n1. **通用具身推理数据**：多模态来源（2D 图像、视频、3D），涵盖空间关系指代、场景描述等，建立全维度空间认知\n2. **自定义具身任务数据**：导航和操作任务，培养初始的具身感知推理能力\n\nSFT 阶段产出 **OmniEVA-Base**。\n\n**Stage 3: TE-GRPO 强化微调**\n\n基于 OmniEVA-Base，使用改进的 GRPO 算法：\n\n1. **格式奖励** $r^{\\text{format}}_i$：检查输出是否遵循 `<think>...<think><answer>...</answer>` 格式，遵循为 1，否则为 0\n\n2. **任务奖励** $r^{\\text{task}}_i(q, o_i)$：衡量语义任务满意度，独立于具身约束（如指向任务中点是否落在目标区域内）\n\n3. **具身奖励** $r^{\\text{embod}}_i(q, o_i)$：验证物理可行性，通过在仿真中检查运动学、可达性和环境约束\n\n4. **渐进式具身课程学习**：引入调度系数 $\\lambda_t \\in [0, 1]$ 随训练逐步增大，从语义正确性过渡到物理可行性：\n$$r^{\\text{acc}}_{i,t}(q, o_i) = r^{\\text{task}}_i(q, o_i) \\cdot [\\lambda_t \\cdot r^{\\text{embod}}_i(q, o_i) + (1 - \\lambda_t)]$$\n\n5. **总奖励**：\n$$r_{i,t}(q, o_i) = r^{\\text{format}}_i(o_i) + r^{\\text{acc}}_{i,t}(q, o_i)$$\n\n6. **策略更新**遵循标准 GRPO 目标，使用 clip 和 KL 散度正则化防止策略偏离过远。\n\nTE-GRPO 阶段产出 **OmniEVA-ER**（ER = Embodiment-aware Reasoning）。\n\n### 训练超参数\n\n- 基座模型：InternVL3-8B\n- Sentence Transformer：all-MiniLM-L6-v2\n- 3D 体素大小：0.1m\n- 图像分辨率：448x448\n- 视频帧数：训练 16 帧，推理 32 帧\n- 优化器：AdamW，weight decay 0.1\n- 使用 bf16 混合精度\n\n## 实验与可视化\n\n### 评估设置\n\n**2D 具身推理基准**（4 个公开 + 4 个自建）：\n- 公开：Where2Place、VSI-Bench、PACO-LVIS、RoboRefit\n- 自建：Where2Go（下一最佳视角选择）、Where2Fit（自由空间预测含碰撞约束）、Where2Approach（遮挡感知导航）、Where2Grasp（物体中心识别）\n\n**3D 具身推理基准**：SQA3D、ScanQA、Scan2Cap、ScanRefer\n\n**端到端仿真评估**：大空间物体搜索、移动操作\n\n**真实世界评估**：两种不同臂展的轮式双臂机器人（75cm 和 70cm 臂展的 Galaxea R1）\n\n### 主要结果\n\n**2D 推理（OmniEVA-Base vs SOTA）**：\n- Where2Place: 74.95（vs RoboBrain2.0-32B 的 73.59）\n- VSI-Bench: 57.17（vs Gemini-2.5-Pro 的 48.83，提升 +8.34）\n- PACO-LVIS: 21.01（vs RoboBrain2.0-32B 的 16.23）\n- RoboRefit: 91.19（vs RoboBrain2.0-32B 的 69.98，提升 +21.21）\n- Where2Go: 86.96（vs Qwen2.5-VL-72B 的 49.76）\n- Where2Fit: 78.14（vs RoboBrain2.0-32B 的 59.23）\n- Where2Grasp: 73.91（vs RoboBrain2.0-32B 的 67.60）\n\n仅 8B 参数，超越 GPT-4o、Gemini-2.5-Pro、InternVL3-78B、Qwen2.5-VL-72B 等大模型。\n\n**3D 推理（OmniEVA-Base vs SOTA）**：\n- SQA3D: 62.9（vs 3DRS 的 60.6，+2.3）\n- ScanQA: 30.6（vs 3DRS 的 30.3，+0.3）\n- Scan2Cap: 94.6（vs 3DRS 的 86.1，+8.5）\n- ScanRefer: 55.8 IoU@0.25（纯文本 I/O，超越之前最好的 44.4）\n\n**物体导航（Object Navigation）**：\n- HM3D: SR 74.2, SPL 42.5（vs UniNavid 的 73.7/37.1，SPL +5.4）\n- MP3D: SR 59.1, SPL 26.2（之前无强基线）\n\n### 消融实验\n\n**3D 融合方式对比**：\n| 方法 | SQA3D | ScanQA | Scan2Cap | ScanRefer | 平均 |\n|------|-------|--------|----------|-----------|------|\n| Cross-Attention (separate) | 55.1 | 27.5 | 43.3 | 4.5 | 32.6 |\n| Cross-Attention (interleaved) | 55.8 | 27.5 | 42.0 | 3.6 | 32.2 |\n| 硬编码 3D 融合 | 61.2 | 31.5 | 95.5 | 41.2 | 57.3 |\n| 无 3D 融合 | 61.2 | 30.7 | 75.5 | 4.3 | 42.9 |\n| 软门控（Ours 变体） | 60.6 | 30.7 | 85.6 | 26.9 | 51.0 |\n| **硬门控（Ours）** | **62.6** | **30.8** | **97.9** | **43.1** | **58.7** |\n\n关键发现：cross-attention 方式导致序列翻倍，Scan2Cap 下降约 50 分；软门控破坏正弦编码精度，全面劣于硬门控。\n\n**TE-GRPO 消融**（Figure 5）：\n- OmniEVA-ER 在所有任务上显著优于 OmniEVA-Base\n- Where2Approach 提升 +28.95%，Where2Fit 提升 +34.28%\n- Mobile Placement Easy +43%，Hard +50%\n- 联合优化 $r^{\\text{task}}$ 和 $r^{\\text{embod}}$ 效果最佳，单独使用任一奖励均有收益但不如组合\n\n**跨具身泛化**（不同臂长）：\n- 训练臂长 75/88/110cm，测试未见过的臂长 72/80/84/92/96/100/105cm\n- OmniEVA-ER 在已见臂长平均 SR 85.08%，未见臂长平均 SR 80.52%\n- 相比 OmniEVA-Base（42.32%）提升约 38 个百分点\n\n### 真实世界部署\n\n两种不同臂展的轮式双臂机器人：\n- Embodiment 1（75cm 臂展）：Cluttered Pick 8/10, Cluttered Place 9/10, Navigation 8/10\n- Embodiment 2（70cm 臂展，Galaxea R1）：Cluttered Pick 7/10, Cluttered Place 9/10, Navigation 8/10\n- 相比 OmniEVA-Base 一致性提升\n\n### 可视化分析\n\n- Figure 4：TAGR 激活率按语义类别分布，验证了选择性 3D 融合的合理性\n- Figure 6：TAGR 激活案例研究，形状查询激活率高（0.73），计数/颜色查询不激活（0.38-0.39）\n- Figure 7：TE-GRPO 前后的放置位置对比，TE-GRPO 生成的位置在机器人可达范围内\n- Figure 9：具身感知推理过程可视化，展示了从场景描述到约束分析的完整推理链\n- Figure 8：动态遮挡场景的鲁棒性，行人遮挡移开后成功识别目标物体\n\n## 相关工作\n\n### 2D 具身推理\n- **SpatialVLM**：引入大规模合成 VQA 进行空间推理\n- **RoboPoint / RoboSpatial / RoboRefer**：细粒度空间接地，预测坐标或边界框\n- **RoboBrain**：统一高层规划与低层空间指向\n- **VSI-Bench / EgoPlan**：基于视频的推理和规划基准\n- **与本文区别**：这些方法局限于 2D 输入，缺乏 3D 几何理解\n\n### 3D 大语言模型\n- **3D-LLM**：注入 3D 世界到 LLM\n- **LLaVA-3D / Video-3D-LLM / 3DRS**：通过 3D 位置编码增强视觉 token\n- **与本文区别**：这些方法使用硬编码 3D 注入策略，不考虑任务是否需要 3D，在 3D 输入不完整或不相关时表现退化\n\n### 具身规划与 RL\n- **PaLM-E / RT-1**：多模态具身模型\n- **GRPO / DeepSeek-R1**：强化学习优化 LLM 推理能力\n- **与本文区别**：先前工作忽略真实机器人的物理约束，TE-GRPO 首次将语义任务奖励和物理执行奖励统一在渐进式课程学习框架中\n\n## 潜在未来工作\n\n1. **Patch-level 门控**：当前 TAGR 是场景级（scene-level）门控，整个场景统一开/关 3D 融合。未来可探索 patch 级门控，在同一场景的不同区域独立决定是否使用 3D，实现更细粒度的几何适配。\n\n2. **更广泛的物理参数建模**：当前具身约束主要考虑臂长，未来可纳入更多参数：自由度（DoF）、安装高度、末端执行器类型、关节限位等，增强对多样化机器人平台的适配。\n\n3. **未建模约束的处理**：当前 TE-GRPO 在仿真中验证物理可行性，但真实世界的摩擦、柔性物体、动态障碍等难以完全建模，需要更强的 sim-to-real 迁移策略。\n\n4. **长程任务规划**：当前主要评估单步或短程任务，将框架扩展到更长的 horizon（如整理房间、烹饪）是重要方向。\n\n5. **多机器人协作**：当前模型针对单一机器人，扩展到多机器人协调规划将是一个有价值的拓展。\n\n6. **数据集和基准释放**：论文声明代码和基准将在接受后释放，这将推动社区在具身感知推理方向上的研究。\n"
+  },
+  {
+    "slug": "reasoning-in-space",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "Reasoning in Space via Grounding in the World",
+      "authors": [
+        "Yiming Chen",
+        "Zekun Qi",
+        "Wenyao Zhang",
+        "Xin Jin",
+        "Li Zhang",
+        "Peidong Liu"
+      ],
+      "abstract": "In this paper, we claim that 3D visual grounding is the cornerstone of spatial reasoning and introduce the Grounded-Spatial Reasoner (GS-Reasoner) to explore the effective spatial representations that bridge the gap between them. Existing 3D LLMs suffer from the absence of a unified 3D representation capable of jointly capturing semantic and geometric information. This deficiency is manifested either in poor performance on grounding or in an excessive reliance on external modules, ultimately hindering the seamless integration of grounding and spatial reasoning. To address this, we propose a simple yet effective dual-path pooling mechanism that tightly aligns geometric features with both semantic and positional cues, constructing a unified image patch-based 3D representation that encapsulates all essential information without increasing the number of input tokens. Leveraging this holistic representation, GS-Reasoner is the first 3D LLM that achieves autoregressive grounding entirely without external modules while delivering performance comparable to state-of-the-art models, establishing a unified and self-contained framework for 3D spatial reasoning. To further bridge grounding and spatial reasoning, we introduce the Grounded Chain-of-Thought (GCoT) dataset. This dataset is meticulously curated to include both 3D bounding box annotations for objects referenced in reasoning questions and step-by-step reasoning paths that integrate grounding as a core component of the problem-solving process. Extensive experiments demonstrate that GS-Reasoner achieves impressive results on 3D visual grounding, which in turn significantly enhances its spatial reasoning capabilities, leading to state-of-the-art performance.",
+      "year": 2025,
+      "venue": "ICLR 2025",
+      "arxiv_id": "2510.13800",
+      "arxiv_url": "https://arxiv.org/abs/2510.13800",
+      "pdf_url": "https://arxiv.org/pdf/2510.13800",
+      "doi": "10.48550/arXiv.2510.13800",
+      "published": true,
+      "note": "Accepted at ICLR 2025. arXiv submitted October 15, 2025. 20 pages, 7 figures. Categories: cs.CV.",
+      "opensource": {
+        "code": [
+          {
+            "url": "https://github.com/WU-CVGL/GS-Reasoner",
+            "description": "Official implementation with training and evaluation scripts",
+            "verified": true
+          }
+        ],
+        "data": [
+          {
+            "url": "https://huggingface.co/datasets/ymccccc/GS-Reasoner-Data",
+            "description": "GCoT dataset (156k QA pairs with grounded CoT annotations)",
+            "verified": true
+          },
+          {
+            "url": "https://huggingface.co/datasets/ymccccc/vggt_slam_processed_data",
+            "description": "VGGT-SLAM processed data for inference pipeline",
+            "verified": true
+          }
+        ],
+        "model": [
+          {
+            "url": "https://huggingface.co/ymccccc/GS-Reasoner",
+            "description": "GS-Reasoner 8B main checkpoint",
+            "verified": true
+          },
+          {
+            "url": "https://huggingface.co/ymccccc/GS-Reasoner-Diverse",
+            "description": "GS-Reasoner 8B diverse variant",
+            "verified": true
+          },
+          {
+            "url": "https://huggingface.co/ymccccc/sonata-wo-normal",
+            "description": "Sonata point cloud encoder without normal",
+            "verified": true
+          }
+        ],
+        "project_page": "https://yiming-cc.github.io/gs-reasoner/",
+        "summary": "代码（Apache-2.0）、模型权重（3个HF模型）、数据集（GCoT+VGGT-SLAM数据）均已开源，配有完整的训练和评估脚本。"
+      }
+    },
+    "notes": "# Reasoning in Space via Grounding in the World\n\n## 元信息\n- **Authors**: Yiming Chen, Zekun Qi, Wenyao Zhang, Xin Jin, Li Zhang, Peidong Liu\n- **Venue**: ICLR 2025\n- **arXiv**: [link](https://arxiv.org/abs/2510.13800)\n- **DOI**: 10.48550/arXiv.2510.13800\n- **开源**: [code](https://github.com/WU-CVGL/GS-Reasoner) / [data](https://huggingface.co/datasets/ymccccc/GS-Reasoner-Data) / [model](https://huggingface.co/ymccccc/GS-Reasoner) / [project page](https://yiming-cc.github.io/gs-reasoner/)\n\n---\n\n## 费曼讲解\n\n想象你在一间陌生的房间里，有人问你：\"电话机在桌子的左边还是右边？\"\n\n要回答这个问题，你首先得**找到**电话机和桌子在哪里（这就是\"grounding\"——把语言中的物体对应到真实空间中的位置），然后才能**判断**它们之间的空间关系（这就是\"spatial reasoning\"）。\n\n人类做这件事是自然而然的：先看到物体，再思考关系。但现有的 3D 大语言模型却做不到这一点——它们要么只能回答问题而找不到物体在哪里（没有 grounding 能力），要么需要借助外部的目标检测器来帮忙定位（依赖外部模块）。这就好比一个人要么只能猜测而不去观察，要么需要另一个人帮忙指认物体，自己无法同时完成\"看到\"和\"思考\"两件事。\n\nGS-Reasoner 的核心想法很简单：**给模型一种统一的 3D 表示，让它同时拥有\"眼睛\"和\"大脑\"**。\n\n具体怎么做呢？想象一张 3D 场景的照片被切成了一个个小方块（patch）。每个方块里既有语义信息（\"这是什么\"——来自视觉基础模型），也有几何信息（\"它在哪里、形状是什么\"——来自点云编码器）。以前的方法要么只用语义、要么只用几何，就像只用一只眼看世界。GS-Reasoner 提出了一种\"双路径池化\"机制：一条路径把几何特征对齐到语义特征，另一条路径把几何特征对齐到 3D 位置信息，最后融合成一个统一的 patch 级表示。这样每个小方块就同时包含了\"是什么、在哪里、形状如何\"三种信息。\n\n有了这个统一表示，模型就可以像人一样，在推理过程中先找到相关物体（输出 3D bounding box），再一步步推理空间关系。为了教会模型这样做，作者还构建了 GCoT（Grounded Chain-of-Thought）数据集：每个问题的答案都包含\"先定位物体，再推理关系\"的完整思维链。\n\n## 摘要翻译\n\n> 在本文中，我们主张 3D 视觉定位是空间推理的基石，并引入了\"接地空间推理器\"（GS-Reasoner）来探索连接二者的有效空间表示。现有的 3D 大语言模型缺乏一种能够同时捕获语义和几何信息的统一 3D 表示。这一缺陷要么表现为定位性能不佳，要么表现为对外部模块的过度依赖，最终阻碍了定位与空间推理的无缝集成。为此，我们提出了一种简单而有效的双路径池化机制，将几何特征与语义线索和位置线索紧密对齐，构建了基于图像 patch 的统一 3D 表示，在不增加输入 token 数量的情况下封装所有必要信息。借助这一整体表示，GS-Reasoner 成为首个完全不依赖外部模块即可实现自回归定位的 3D 大语言模型，同时达到了与最先进模型相当的性能，建立了一个统一且自包含的 3D 空间推理框架。为了进一步连接定位与空间推理，我们引入了\"接地思维链\"（GCoT）数据集。该数据集经过精心策划，包含推理问题中所引用物体的 3D 边界框标注，以及将定位作为问题解决核心步骤的逐步推理路径。大量实验表明，GS-Reasoner 在 3D 视觉定位方面取得了令人瞩目的成果，进而显著提升了其空间推理能力，达到了最先进的性能。\n\n## 引言翻译\n\n> 视觉-空间智能涵盖感知、理解和推理 3D 空间的能力，包括空间布局、物体大小、位置及其潜在交互。这一技能对于具身智能和自动驾驶等领域至关重要。准确地将 3D 物体与文本描述相关联（即 3D 视觉定位任务）是有效空间推理的前提。这与人类的认知过程一致——识别相关物体是推理其空间关系之前的基本步骤。\n>\n> 尽管 3D 大语言模型近期取得了进展，但 3D LLM 仍然依赖预训练的 3D 检测器或外部解码器进行定位。这种依赖不仅限制了它们全面理解 3D 场景的能力，还阻碍了定位与空间推理的协同整合。因此，一个关键问题随之而来：我们如何使 3D LLM 以自回归方式进行自然而有效的定位，从而增强其空间推理能力？\n>\n> 我们确定了定位增强空间推理的两个主要挑战。第一个挑战源于 3D 数据的固有复杂性。与 2D 图像不同，基于点云的 3D 场景编码了丰富的空间关系和深度线索，这些信息难以捕获并与 LLM 的语义空间对齐，尤其是在大规模 3D 数据集稀缺的情况下。此外，表示细粒度结构通常需要大量更多的 token，进一步增加了建模成本。先前的工作使用 Q-Former 压缩点云特征，其他方法采用基于体素的表示来更好地保留结构。然而，这些方法通常以几何保真度换取 token 效率，且提取的点云特征仅包含有限的语义信息，使得精确的定位和推理变得困难。更新的方法将 3D 位置线索编码到来自视觉基础模型的基于视频的语义特征中，展示了视觉 LLM 预训练对 3D 推理的益处。然而，仅从 3D 位置编码导出的几何线索较弱，这限制了定位性能。第二个挑战在于缺乏将定位作为中间步骤整合到空间推理中的高质量数据集。现有的 3D VQA 数据集仅提供简短答案，没有定位标注或推理步骤，使得定位与推理的结合成为不可能。此外，这些数据集未能捕获全面空间推理所需的上下文丰富性和结构复杂性。\n>\n> 在本文中，我们提出了一种新方法来应对上述挑战，引入了全面的 3D 场景表示和用于空间推理的 GCoT 数据集。我们的 3D 场景表示整合了来自视觉基础模型的语义特征、点云编码器编码的几何特征和 3D 位置信息。关键思想是在基于图像 patch 的表示中统一这些异构信号。具体地，我们以双路径方式池化点图的几何特征，使其与图像 patch 的对应语义特征和 3D 位置对齐，随后将它们融合为统一的混合表示。这种混合表示保留了 LLM 通过视觉-语义预训练获得的强大泛化能力，同时几何信息的融入显著增强了其 3D 场景理解能力。因此，GS-Reasoner 能够在不依赖任何外部模块的情况下精确定位物体，这为空间推理提供了自然的中间步骤。为了训练能够处理两项任务的模型，我们构建了 GCoT 数据集。它包含推理问题中所提及物体的精确 3D 边界框标注，以及将定位嵌入为核心问题解决步骤的逐步推理路径。\n\n## 论文总结\n\n本文提出了 GS-Reasoner，一个将 3D 视觉定位（grounding）融入空间推理思维链过程的 3D LLM 框架。通过设计双路径池化机制构建语义-几何混合 3D 场景表示，GS-Reasoner 成为首个完全不依赖外部模块即可自回归预测 3D bounding box 的 3D 大语言模型，并在 VSI-Bench 空间推理基准上达到了最先进的性能。同时，作者构建了 156k 规模的 GCoT 数据集，将定位标注与逐步推理路径相结合，教会模型\"先定位、再推理\"的认知范式。\n\n## 核心问题\n\n**核心问题**：如何让 3D LLM 在不依赖外部模块的情况下，同时实现精确的 3D 视觉定位和空间推理？\n\n**为什么重要**：\n- 3D 视觉定位是空间推理的基础——在推理物体间的空间关系前，必须先知道物体在哪里。这与人类认知过程一致。\n- 现有 3D LLM 存在两方面不足：\n  1. **表示瓶颈**：要么用 Q-Former/体素压缩点云（几何保真度低），要么用视频语义特征+3D 位置编码（几何线索弱），无法同时捕获语义和几何信息。\n  2. **数据瓶颈**：现有 3D VQA 数据集只有短答案，没有定位标注和推理步骤，无法训练模型\"先定位再推理\"的能力。\n- 外部模块的依赖使得定位和推理无法端到端协同，限制了整体性能。\n\n## 方法详解\n\n### 整体框架\n\nGS-Reasoner 的输入是一组 $N$ 张 RGB 图像 $\\{I_i \\in \\mathbb{R}^{3 \\times H \\times W}\\}_{i=1}^N$ 及其对应的深度图 $\\{D_i \\in \\mathbb{R}^{H \\times W}\\}_{i=1}^N$、相机内参 $K \\in \\mathbb{R}^{3 \\times 3}$ 和外参 $\\{T_i \\in \\mathbb{R}^{4 \\times 4}\\}_{i=1}^N$。框架包含三个核心组件：\n\n1. **语义编码器**：使用预训练的 SigLIP 视觉基础模型提取图像 patch 级语义特征\n2. **几何编码器**：使用 Sonata（基于 PTv3 的自监督点云编码器）提取几何特征\n3. **视频 LLM**：基于 LLaVA-Video 7B（Qwen2-7B），接收融合后的特征进行自回归推理\n\n### 语义-几何混合 3D 场景表示\n\n**几何特征提取**：\n- 深度图反投影为点图 $\\{P_i \\in \\mathbb{R}^{3 \\times H \\times W}\\}_{i=1}^N$\n- 将点图按 patch 大小 $p \\times p$ 分块，每个 patch 均匀采样 $K$ 个点\n- 所有采样点汇聚为点云 $P \\in \\mathbb{R}^{M \\times 3}$，送入 PTv3 编码器\n- PTv3 使用空间填充曲线序列化点云，通过 U-Net 结构和序列化注意力捕获局部和全局上下文\n- 通过 unpooling 恢复原始分辨率，得到几何特征图 $\\{G_i \\in \\mathbb{R}^{C \\times K \\times H' \\times W'}\\}_{i=1}^N$\n\n**双路径池化（Dual-Path Pooling）**：\n这是本文的核心技术创新。朴素的做法是在每个 patch 内对几何特征做 max pooling、对点图做 mean pooling，但这会导致语义-几何不对齐。双路径池化的设计如下：\n\n- **路径 1（位置对齐）**：对点图坐标做插值（interpolate），使其与 patch 的 3D 位置对齐，得到位置感知的几何特征\n- **路径 2（语义对齐）**：使用自适应交叉注意力（Adaptive Cross-Attention），将几何特征与语义特征对齐\n\n两条路径分别产生与位置和语义对齐的几何特征，最后通过 Patch-based Fusion 融合为统一的混合表示。这样每个 patch token 同时编码了语义（\"是什么\"）、几何（\"形状如何\"）和位置（\"在哪里\"）三种信息，且**不增加输入 token 数量**。\n\n### 自回归输出格式\n\nGS-Reasoner 使用 Chain-of-Thought 格式组织输出：\n1. `<think>` 块内：分析查询 → 列出相关物体的 3D bounding box（格式：`OBJECT_NAME OBJECT_COUNT <bbox>(x1,y1,z1,x2,y2,z2)</bbox>`）→ 逐步推理\n2. `<answer>` 块内：简洁的最终答案\n\n### GCoT 数据集\n\n**构建流程**：\n1. 从 ScanNet、ScanNet++、ARKitScenes 生成空间推理 QA 对（不含 CoT），包括 8 类任务：物体计数、绝对距离、物体大小、房间大小、相对距离、相对方向、路径规划、出现顺序\n2. 保留生成过程中使用的物体 bounding box 信息\n3. 利用鸟瞰图（BEV）+ 物体信息 + QA 对，prompt GPT-4o 生成 CoT 推理路径\n4. 最终数据集 156k QA 对，其中 79% 包含 CoT 标注\n\n**任务分布**：相对距离（48.3%）、出现顺序（16.2%）、相对方向（15.6%）、绝对距离（9.8%）、物体大小（3.8%）、物体计数（2.6%）、房间大小（2.2%）、路径规划（1.5%）\n\n### 训练流程\n\n- **预训练阶段**：在 ScanRefer、Multi3DRef、SR3D、NR3D 上 warm up 物体定位能力\n- **微调阶段**：在 GCoT 数据集 + 剩余定位数据 + ScanQA/SQA3D/Scan2Cap 上微调\n- **损失函数**：标准的 next-token prediction 交叉熵损失\n- **数据增强**：Z 轴旋转 [90, 180, 270] 度、随机缩放 [0.75, 1.25]、平移 [-1, 1] 米（解耦几何和位置线索，防止过拟合）\n- **超参**：$K=64$，每场景采样 $N \\in [16, 48]$ 张图像，LLM 学习率 $1 \\times 10^{-5}$，其他模块预训练 $1 \\times 10^{-4}$、微调 $1 \\times 10^{-5}$\n\n### 推理流程（无 GT 深度时）\n\n使用 VGGT-SLAM 重建密集深度图和相机参数，再用 MoGe-2 估计绝对尺度深度，通过优化全局尺度因子 $s$ 对齐两者：\n\n$$s^* = \\arg\\min_{s>0} \\sum_{i=1}^{N} \\sum_{j=1}^{M_i} \\|s \\cdot p^{\\text{VGGT-SLAM}}_{i,j} - p^{\\text{MoGe-2}}_{i,j}\\|^2$$\n\n## 实验与可视化\n\n### 实验设置\n\n- **3D 视觉定位**：ScanRefer、Multi3DRef、SR3D、NR3D（指标：Acc@25、Acc@50、F1@25、F1@50）\n- **空间推理**：VSI-Bench（5000+ QA 对，8 类任务，MCA 和数值两种答案格式）\n- **通用 3D 任务**：Scan2Cap、ScanQA、SQA3D\n- **零样本泛化**：仅在 ScanNet 上训练，在 ScanNet++ 和 ARKitScenes 上测试\n- **基线**：专家模型（3D-VisTA、PQ3D、UniVLG、Locate 3D）、3D LLM + 提案、3D LLM + 外部模块、纯 3D LLM\n\n### 主要结果\n\n**3D 视觉定位（Table 1）**：\n- ScanRefer: Acc@25 = 60.8, Acc@50 = 42.2（无需外部模块的 3D LLM 中表现最佳）\n- Multi3DRef: F1@25 = 61.7（SOTA，超过使用外部模块的方法）\n- SR3D: Acc@25 = 56.7, NR3D: Acc@25 = 50.0\n\n**空间推理 VSI-Bench（Table 2）**：\n- 预测深度：平均排名 1（64.7），在相对方向（88.9%）和绝对距离（61.9%）上大幅领先\n- GT 深度：平均 70.1，比前 SOTA VLM-3R 高约 10 个百分点\n- 相对方向任务达到 90.5%（GT 深度），接近人类水平的 94.7%\n\n**通用 3D 任务（Table 3）**：\n- Scan2Cap 全指标 SOTA：CIDEr = 101.0（vs ROSS3D 的 81.3）\n- ScanQA 和 SQA3D 上与 SOTA 持平\n\n**零样本泛化（Table 4）**：\n- ARKitScenes 上 Acc@25 = 45.6，接近 Locate 3D 专家模型的 46.2\n\n### 消融实验关键发现\n\n**3D 表示消融（Table 5）**：\n- 无位置编码（纯图像）：Acc@25 = 0（完全失败）\n- 平均位置编码（Video-3D LLM 方式）：15.4 → 数据增强后 53.2\n- 加入几何特征 + 双路径池化：60.8（比基线 +7.6）\n- 双路径池化比朴素 max pooling 高 +3.3 Acc@25\n\n**GCoT 消融（Table 6）**：\n- 无 CoT 的基线：平均 52.3\n- 加入 grounding 能力但无 CoT：57.7（+5.4）\n- 完整 GCoT 训练：66.1（+13.8），其中绝对距离提升 +16.8、相对方向提升 +28.2\n\n### 可视化\n\n论文展示了在 VSI-Bench 上的定性结果（Figures 4-7），包括从野外视频（无 3D 传感器输入）中自回归生成的 3D bounding box 和推理过程，验证了模型的泛化能力。\n\n## 相关工作\n\n**3D LLM for 3D Understanding**：\n- 早期工作（3D-LLM）用 Q-Former 对齐点云特征，后续有体素方法（Scene-LLM）和物体中心方法（Chat-Scene）\n- 最新方法（Video-3D LLM、ROSS3D）将 3D 位置信息编码到视频语义特征中\n- **本文区别**：GS-Reasoner 通过双路径池化统一语义和几何，首次实现无外部模块的自回归定位\n\n**Video-Language Models for Spatial Reasoning**：\n- Spatial-MLLM 和 VLM-3R 通过引入几何特征增强空间推理\n- **本文区别**：现有方法的答案格式受限（选择题/数值），本文通过 CoT 格式让模型自由推理，且将定位作为推理的中间步骤\n\n**Point Cloud Representation Learning**：\n- PointNet/PointNet++ → Point Transformer 系列 → Sonata（自监督预训练）\n- **本文使用**：Sonata（PTv3 的自监督版本）作为几何编码器\n\n## 潜在未来工作\n\n1. **机器人/具身智能应用**：将 GS-Reasoner 的空间推理能力应用于 VLA（Vision-Language-Action）模型，作为具身大脑进行任务规划和分解\n2. **联合微调**：将 GCoT 数据与动作数据联合训练，增强具身推理的泛化能力\n3. **ScanQA/SQA3D 的改进**：这些数据集存在大量模糊问题和答案分布偏差，引入重建约束（如 ROSS3D 的方式）可能促使模型更好地利用 3D token\n4. **更高效的 3D 表示**：当前方法需要密集深度图和相机参数，探索从单目视频直接推断的更轻量方案\n5. **更大规模的 GCoT 数据集**：扩展到更多场景类型（室外、大规模场景）和更复杂的推理任务\n"
+  },
+  {
+    "slug": "s2-mllm-spatial-reasoning-3d-grounding",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "S²-MLLM: Boosting Spatial Reasoning Capability of MLLMs for 3D Visual Grounding with Structural Guidance",
+      "authors": [
+        "Beining Xu",
+        "Siting Zhu",
+        "Zhao Jin",
+        "Junxian Li",
+        "Hesheng Wang"
+      ],
+      "abstract": "3D Visual Grounding (3DVG) focuses on locating objects in 3D scenes based on natural language descriptions, serving as a fundamental task for embodied AI and robotics. Recent advances in Multi-modal Large Language Models (MLLMs) have motivated research into extending them to 3DVG. However, MLLMs primarily process 2D visual inputs and struggle with understanding 3D spatial structure of scenes solely from these limited perspectives. Existing methods mainly utilize viewpoint-dependent rendering of reconstructed point clouds to provide explicit structural guidance for MLLMs in 3DVG tasks, leading to inefficiency and limited spatial reasoning. To address this issue, we propose S²-MLLM, an efficient framework that enhances spatial reasoning in MLLMs through implicit spatial reasoning. We introduce a spatial guidance strategy that leverages the structure awareness of feed-forward 3D reconstruction. By acquiring 3D structural understanding during training, our model can implicitly reason about 3D scenes without relying on inefficient point cloud reconstruction. Moreover, we propose a structure-enhanced module (SE), which first employs intra-view and inter-view attention mechanisms to capture dependencies within views and correspondences across views. The module further integrates multi-level position encoding to associate visual representations with spatial positions and viewpoint information, enabling more accurate structural understanding. Extensive experiments demonstrate that S²-MLLM unifies superior performance, generalization, and efficiency, achieving significant performance over existing methods across the ScanRefer, Nr3D, and Sr3D datasets. Code will be available upon acceptance.",
+      "year": 2025,
+      "venue": "CVPR 2026",
+      "arxiv_id": "2512.01223",
+      "arxiv_url": "https://arxiv.org/abs/2512.01223",
+      "pdf_url": "https://arxiv.org/pdf/2512.01223",
+      "doi": "10.48550/arXiv.2512.01223",
+      "published": true,
+      "note": "Accepted to CVPR 2026. Code released on GitHub.",
+      "opensource": {
+        "code": [
+          {
+            "url": "https://github.com/IRMVLab/S2-MLLM",
+            "description": "Official implementation with training/evaluation scripts, preprocessing tools, based on LLaVA-Video-7B and Fast3R",
+            "verified": true
+          }
+        ],
+        "data": [],
+        "model": [],
+        "project_page": "",
+        "summary": "官方代码已在 GitHub 开源（IRMVLab/S2-MLLM），包含完整的训练和评估脚本，Apache-2.0 许可证。无预训练模型或独立数据集发布。"
+      }
+    },
+    "notes": "# S²-MLLM: Boosting Spatial Reasoning Capability of MLLMs for 3D Visual Grounding with Structural Guidance\n\n## 元信息\n- **Authors**: Beining Xu, Siting Zhu, Zhao Jin, Junxian Li, Hesheng Wang\n- **Venue**: CVPR 2026\n- **arXiv**: [link](https://arxiv.org/abs/2512.01223)\n- **DOI**: 10.48550/arXiv.2512.01223\n- **开源**: [code](https://github.com/IRMVLab/S2-MLLM) / 暂无data / 暂无model\n\n---\n\n## 费曼讲解\n\n大家好，我来解释一下我们这篇论文的核心想法。\n\n想象你是一个人，站在一个你从没去过的房间里。有人告诉你\"找到靠墙放的那把黑色椅子\"。你可以环顾四周，很自然地理解\"靠墙\"意味着什么——你心里有一个关于这个房间三维布局的内在模型，你知道墙在哪里、椅子在哪里、它们之间的空间关系是什么。\n\n现在想象让一个 AI 来做这件事。当前的多模态大语言模型（MLLMs）非常擅长理解图片——给它一张照片，它能告诉你里面有什么物体。但它们本质上是\"平面的\"：它们看到的是一个个 2D 图像，而不是完整的 3D 世界。这就好像让一个只看过明信片的人来理解一个房间的布局——他能认出照片里的东西，但很难推断\"桌子左边\"到底是什么意思。\n\n现有的解决方案是什么呢？它们基本上是在做\"搭积木\"：先把多张图片重建成 3D 点云，然后从某个视角渲染出 2D 图像（比如鸟瞰图），再喂给 MLLM。这就像让建筑师先画出房间的俯视图，然后你再看俯视图来找东西。这个方法能用，但有两个大问题：（1）渲染出来的图像受视角限制，可能有遮挡，看不到完整结构；（2）重建点云在推理时非常耗时。\n\n我们的核心想法非常直觉：**与其在推理时费力地重建 3D 结构，不如在训练时就教会模型隐式地理解 3D 空间。**\n\n具体怎么做的呢？我们借鉴了 feed-forward 3D 重建技术（比如 Fast3R）的思路。这些技术可以直接从多视角图片预测 3D 点云，它们天然就具备对 3D 结构的理解能力。我们的做法是：在训练时，除了让模型完成 3D 视觉定位（找目标物体）这个主任务，还同时让它做 3D 重建。通过这种联合训练，模型被迫学习到具有 3D 结构意识的视觉表征。\n\n这就好像你练习画画时，不只是临摹图片，还被要求画出物体的透视关系——久而久之，你即使不画透视线，也能直觉地理解空间关系。\n\n此外，我们还设计了一个结构增强模块（Structure-Enhanced Module, SE）。这个模块做了两件关键的事：\n\n1. **多级位置编码**：不仅告诉模型每个像素\"在哪张图的哪个位置\"，还告诉它在 3D 空间中的真实坐标，以及相机的观察方向。这就像给你一张地图时，不仅标注了\"上北下南\"，还标注了每栋楼的 GPS 坐标。\n\n2. **视图内和跨视图注意力**：视图内注意力让模型理解同一张图片中各部分的空间关系；跨视图注意力让模型对齐不同视角看到的同一个物体——比如从正面看到的椅子和从侧面看到的椅子是同一把。\n\n最关键的是，**所有这些 3D 理解能力在推理时都不需要额外的点云重建**。3D 重建分支只在训练时使用，推理时直接关闭，所以我们的方法比现有方法快得多，同时效果更好。\n\n打个比方：现有方法就像是每次做菜都要先查菜谱，而我们的方法是通过大量练习把烹饪技术内化了——闭着眼睛也能做。\n\n## 摘要翻译\n\n> 3D 视觉定位（3DVG）致力于根据自然语言描述在 3D 场景中定位目标物体，是具身智能和机器人领域的基础任务。多模态大语言模型（MLLMs）的最新进展推动了将其扩展到 3DVG 的研究。然而，MLLMs 主要处理 2D 视觉输入，仅凭这些有限的视角难以理解场景的 3D 空间结构。现有方法主要利用重建点云的视角相关渲染来为 MLLMs 在 3DVG 任务中提供显式的结构引导，但这种方式效率低下且空间推理能力有限。为解决这一问题，我们提出了 S²-MLLM，一个通过隐式空间推理增强 MLLMs 空间推理能力的高效框架。我们引入了一种空间引导策略，利用前馈式 3D 重建的结构感知能力。通过在训练过程中获得 3D 结构理解，我们的模型能够在推理时隐式地推理 3D 场景，而无需依赖低效的点云重建。此外，我们提出了一个结构增强模块（SE），首先利用视图内和跨视图注意力机制来捕获视图内的依赖关系和跨视图的对应关系。该模块进一步整合多级位置编码，将视觉表征与空间位置和视角信息关联起来，实现更准确的结构理解。大量实验表明，S²-MLLM 统一了卓越的性能、泛化能力和效率，在 ScanRefer、Nr3D 和 Sr3D 数据集上显著超越现有方法。代码将在论文接收后公开。\n\n## 引言翻译\n\n> 3D 视觉定位（3DVG）旨在根据文本描述在 3D 场景中定位被引用的物体，是具身智能和增强现实的关键能力。与 2D 视觉定位相比，3DVG 需要对空间关系和 3D 场景结构有全面的理解，因而面临更大的挑战。\n>\n> 传统方法主要依赖在有限范围的数据集上进行训练，导致在真实场景中的泛化性和可扩展性有限。为克服这一局限，利用 MLLMs 的推理和泛化能力来进行 3DVG 已成为一个有前景的方向。然而，MLLMs 的 2D 中心化训练与 3DVG 所需的空间理解能力之间仍存在显著差距。MLLMs 主要在大量图像-文本数据上训练，没有接触过 3D 物理世界，而 3D 世界涉及深度、视角、布局和结构等额外因素。因此，MLLMs 仅凭 2D 图像无法理解 3D 场景。\n>\n> 现有方法试图通过显式重建 3D 场景的点云来弥补这一不足。这些重建的点云随后被渲染为保留布局和空间关系的 2D 表示，如多视角图像或鸟瞰图（BEV）图像。MLLMs 可以直接处理这些渲染图像来选择目标物体。然而，特定视角的渲染图像无法反映 3D 场景的完整结构，且不可避免地受到视角选择和遮挡的影响。此外，这些方法在推理时需要重建点云，导致效率低下。\n>\n> 为解决这些挑战，我们提出了一个新颖的框架 S²-MLLM，用于增强 MLLMs 在 3DVG 中的空间推理能力。我们的核心洞察是鼓励模型在训练过程中隐式内化 3D 结构感知。这一设计使 S²-MLLM 能够在潜空间中隐式推理 3D 场景，无需在推理时进行额外的重建或渲染。具体而言，我们利用前馈式 3D 重建的能力来引入空间引导。这些重建技术可以直接从多视角输入推导 3D 结构，展现出对空间理解的固有能力。基于这一特性，我们将重建目标通过端到端联合优化集成到训练流程中，使模型学习结构感知的视觉表征和空间推理能力。\n>\n> 此外，我们提出了结构增强（SE）模块，从位置和视角的角度进一步增强 MLLMs 的空间理解。我们观察到：（i）没有位置线索（如 3D 坐标、相机射线）与视觉外观之间的显式关联，MLLMs 难以理解细粒度的空间关系，如距离、方向和相对关系；（ii）MLLMs 在独立的图像-文本对上预训练，难以在不同视角间保持语义一致性。因此，我们首先整合多级位置编码来增强位置和视角信息的建模。其次，我们采用跨视图注意力机制在视角转换时强制语义对齐。在每个视图内，我们进行视图内注意力以捕获 patch 之间的依赖关系，改善局部和全局上下文理解。我们在域内和域外基准上进行了大量实验。S²-MLLM 在准确性、效率和泛化性方面均表现突出。\n>\n> 总体而言，我们做出以下贡献：\n> - 提出 S²-MLLM，一个增强 MLLMs 空间推理能力以改进 3DVG 的有效框架\n> - 引入空间引导策略，利用前馈式 3D 重建的能力鼓励模型进行潜空间空间推理\n> - 设计结构增强模块（SE），通过建模位置和视角以及采用视图内和跨视图注意力来增强上下文对齐和跨视图一致性\n> - 在 ScanRefer、Nr3D 和 Sr3D 数据集上的大量实验表明 S²-MLLM 显著超越基线方法\n\n## 论文总结\n\n本文提出了 S²-MLLM，一个面向 3D 视觉定位（3DVG）任务的 MLLM 增强框架。其核心创新在于：通过在训练时联合优化前馈式 3D 重建目标，使模型在潜空间中隐式获得 3D 结构理解能力，从而在推理时无需显式点云重建即可进行有效的 3D 空间推理。配合结构增强模块（多级位置编码 + 视图内/跨视图注意力），S²-MLLM 在 ScanRefer、Nr3D 和 Sr3D 三个基准上实现了 SOTA 性能，同时训练成本仅为全参数微调的 25%，推理延迟与基线相当。\n\n## 核心问题\n\n**问题**：如何让 MLLM 理解 3D 空间结构以完成 3D 视觉定位？\n\n**为什么重要**：3DVG 是具身智能和机器人的基础能力。MLLMs 具有强大的推理和泛化潜力，但它们的 2D 视觉先验不足以理解 3D 空间关系（深度、遮挡、视角、布局）。\n\n**现有方法的不足**：\n1. **显式重建方法**（如 GPT4Scene 用 BEV、SeeGround 用渲染图像）：推理时需要重建点云并渲染，耗时严重（需额外时间 t₀）；渲染图像受视角选择和遮挡影响，无法全面反映 3D 结构\n2. **传统监督方法**：泛化性差，局限于特定数据集分布\n3. **零样本方法**：多次 API 调用导致推理慢，且缺乏 3D 结构理解\n\n## 方法详解\n\n### 整体框架\n\nS²-MLLM 基于 LLaVA-Video-7B 构建，将 3D 场景表示为多视角 RGB-D 视频序列。输入包括：多视角 RGB-D 图像 {(Iᵥ, Dᵥ)}、相机参数、自然语言描述 Q、以及候选物体的 3D bounding box {oᵢ}。模型预测目标物体的 3D bounding box 和类别。\n\n框架分为三个主要路径：\n1. **感知路径**（Perception）：视频编码器 + 位置编码器 + 结构增强模块 → 视觉 token\n2. **潜空间 3D 推理路径**（Latent 3D Reasoning）：Video LLM 处理视觉 token + 语言 token\n3. **空间引导路径**（Spatial Guidance，仅训练时）：重建解码器预测点云图\n\n### 空间引导策略（Spatial Guidance, SG）\n\n**动机**：MLLMs 的 2D 视觉先验不足以推断 3D 结构。现有方法通过渲染重建点云提供显式引导，但效率低且受视角/遮挡限制。\n\n**方法**：\n- 基于 Fast3R（前馈式 3D 重建模型）构建重建分支\n- 将 MLLM 的视觉编码器 Eᵥ 替换 Fast3R 的 ViT，保证重建和 3DVG 在统一表征空间中\n- 引入投影层 P 对齐和归一化表征（因为 3D 重建需要 dense/structure-aware 特征而非 semantic 特征）\n- 保留 Fast3R 的 fusion transformer 和 decoding heads\n- 重建分支预测局部点云图 Xₗ 和全局点云图 Xg\n- 重建损失采用 Fast3R 的置信度加权点云图回归损失\n\n**关键设计**：\n- 重建解码器在训练时冻结，仅微调投影层和视觉编码器\n- 重建损失收敛较早，提供稳定的结构监督\n- **推理时完全关闭重建分支**，不增加任何推理延迟\n\n### 结构增强模块（Structure-Enhanced Module, SE）\n\n#### 视图内和跨视图注意力（Intra-view & Inter-view Attention）\n\n**动机**：MLLMs 在不同视角间无法保持语义一致性（无法判断不同视角看到的椅子是否是同一把），也无法建立视图内的结构对应关系。\n\n**方法**：采用 divided-attention 设计（类似视频建模中的时间-空间分解）：\n- 给定多视角图像特征 f ∈ R^(B×(V·H·W)×dim)\n- **跨视图注意力**：对于每个 patch 索引 s，跨所有视图收集对应 patch，计算 attention（关注\"同一位置在不同视角下的语义一致性\"）\n- **视图内注意力**：按视图索引 v 分组，计算每个视图内所有 patch 的 attention（关注\"同一图片内的空间依赖关系\"）\n\n#### 多级位置编码（Multi-level Position Encoding, MPE）\n\n**动机**：虽然空间引导鼓励模型推断 3D 结构，但缺乏显式的视觉-位置关联，限制了细粒度空间关系的理解。\n\n**方法**：\n1. 利用深度图 D 和相机内外参将每个像素投影到 3D 世界坐标 p_world = (x, y, z)\n2. 计算每个像素对应的相机射线方向 r（从相机原点到 3D 点的归一化方向）\n3. 使用正弦位置编码 φ(·) 编码每个 patch 的平均 3D 坐标，加到视觉特征上\n4. 通过平均池化聚合邻域 patch 特征，得到上下文增强特征\n5. 使用可学习位置编码 ψ(·)（MLP 实现）编码相机射线方向\n6. 最终位置感知视觉表征：f_vis = AvgPool(fᵢ + φ(p_world)) + ψ(rᵢ)\n\n### 损失函数\n\n总损失 = λg·L_ground + λr·L_recon + λl·L_lang\n\n1. **Grounding Loss (L_ground)**：InfoNCE 对比损失，将目标物体的特征 f_obj 与 LLM 的 ⟨ground⟩ token 隐藏状态 h 对齐。物体特征由落在 bounding box 内的 patch 特征平均得到，并加上物体中心的 3D 位置编码。\n2. **Reconstruction Loss (L_recon)**：置信度加权的点云图回归损失（局部 + 全局点云图），来自 Fast3R。\n3. **Language Loss (L_lang)**：交叉熵损失，监督模型生成文本回答如 \"The [object category] is located at ⟨ground⟩ in the global coordinates\"，解决目标物体分类错误的问题。\n\n超参数：λg = 1.0，λr = 0.3，λl = 1.0\n\n### 训练细节\n\n- 基于 LLaVA-Video-7B，使用 LoRA (rank=64, α=16)\n- 最后 4 层 LLM、投影层、跨视图/视图内注意力全参数微调\n- 重建解码器冻结\n- 训练 1 epoch，batch size=8（梯度累积 8 步，实际 batch=1），单张 A100 (80GB)\n- 学习率 2e-5，ViT 学习率 2e-4\n- 训练时使用 GT bounding box 作为 proposal；推理时使用 Mask3D 生成的 proposal\n\n## 实验与可视化\n\n### 数据集\n\n- **训练集**：ScanRefer + Nr3D + Sr3D 联合训练\n- **域内评估**：ScanRefer（51,583 描述，11,046 物体）、Nr3D（自然描述）、Sr3D（模板描述）\n- **域外评估**：MultiScan（不同场景布局和物体组成）、ArkiScenes（真实世界移动设备扫描）\n\n### 主要结果\n\n**ScanRefer（Table 1）**：\n- Overall Acc@0.25: **59.2%**（SOTA），比前最佳 TSP3D 高 2.7%\n- Overall Acc@0.5: **52.7%**，比前最佳高 6.0%\n- Multiple Acc@0.5: **46.6%**，比前最佳高 **10.0%**（多相似物体场景的显著提升）\n- 相比同样用 LoRA 微调的 Video-3D-LLM，各项指标提升 5%+\n\n**Nr3D/Sr3D（Table 2）**：\n- Pred 设置下：Sr3D 53.9%，Nr3D **50.6%**（SOTA）\n- GT 设置下：Nr3D **59.8%**（与最佳持平）\n- 在 Pred 设置（更贴近实际应用）下表现尤其突出\n\n**效率（Table 3）**：\n- 训练时间：72 GPU hours，仅为 Video-3D-LLM (256h) 的 28%\n- 可训练参数：1,767 MB，仅为全参数微调 (8,079 MB) 的 22%\n- 推理延迟：1.16s，与 Video-3D-LLM 相当（1.04s），远快于 SeeGround (3.97s + t₀)\n- 空间引导仅增加约 10% 训练时间和 4 MB 参数\n\n**域外泛化（Table 4）**：\n- MultiScan Acc@0.25: **59.13%**（vs SeeGround 53.41%）\n- ArkiScenes Acc@0.25: **43.26%**（vs SeeGround 38.82%）\n- 无需任何微调即可在分布外数据上保持强性能\n\n### 消融实验（Table 5）\n\n| 组件移除 | Acc@0.25 下降 | Acc@0.5 下降 |\n|---------|-------------|-------------|\n| w/o SG (空间引导) | -4.78% | -4.22% |\n| w/o MPE (多级位置编码) | **-15.05%** | -14.18% |\n| w/o Attn (注意力机制) | -0.05% | -0.37% |\n| w/o LG (语言引导) | -1.43% | -1.82% |\n\n- 多级位置编码（MPE）的影响最大，说明显式位置信息对基于 LLM 的 3DVG 至关重要\n- 空间引导在稀疏观测下效果更显著（16→24 帧时，w/o SG 提升 2.06%，而 Full 仅提升 1.41%），说明 SG 降低了对密集多视角输入的依赖\n- 额外消融（Table 8）：Base+Attn 相比 Base 从 5.31% 跃升到 41.74%，证明注意力机制是基础性能的关键\n\n### 定性分析\n\n- S²-MLLM 在布局理解、视角指定、遮挡处理、多相似物体区分等方面明显优于 SeeGround\n- 错误类型分析：空间推理错误（复杂多锚点关系）和语义错误（细粒度属性误判）是主要失败模式\n\n## 相关工作\n\n1. **监督式 3DVG**：分为两阶段方法（proposal-matching）和一阶段方法（直接回归 3D box）。代表工作有 ScanRefer、InstanceRefer、BUTD-DETR、EDA 等。局限：泛化性差。\n2. **零样本 3DVG**：利用 LLM 将 3DVG 分解为子任务。早期方法转为文本描述，VLM 方法用渲染图像。局限：无法捕获复杂 3D 空间关系。\n3. **MLLMs 用于 3D 场景理解**：\n   - 点云方法（LL3DA、Point-Bind 等）：模态差距大、3D 标注有限\n   - 视频序列方法：LLaVA-3D（CLIP 特征投影到体素）、GPT4Scene（BEV 渲染）、ROSS3D（BEV 生成任务）\n   - GPT4Scene：推理时重建耗时\n   - ROSS3D：受遮挡和噪声影响\n\n**本文区别**：不依赖显式点云重建和渲染，通过训练时的隐式空间引导和结构增强模块实现高效的 3D 空间推理。\n\n## 潜在未来工作\n\n1. **扩展到更多 3D 任务**：3D 密集描述（3D dense captioning）、3D 问答、3D 场景图生成等——当前框架的潜空间 3D 推理能力可直接迁移\n2. **减少对深度图的依赖**：当前使用 RGB-D 输入，探索仅用 RGB 图像（结合单目深度估计）可能扩大应用范围\n3. **动态场景理解**：当前针对静态场景，扩展到动态场景（如机器人实时操作环境）是具身智能的关键方向\n4. **更高效的重建分支**：当前使用 Fast3R 作为重建骨干，更轻量的前馈重建模型可能进一步降低训练成本\n5. **与点云方法的融合**：将隐式空间推理与显式点云特征结合，可能在效率和精度之间取得更好的平衡\n6. **更大规模的 3D 数据**：当前在 ScanNet 系列上训练，扩展到更大规模、更多样化的 3D 场景数据集可能进一步提升泛化性\n7. **交互式 3D 定位**：结合具身智能中的主动探索策略，让机器人在移动中持续更新 3D 理解\n"
+  },
+  {
+    "slug": "vid-llm",
+    "has_pdf": true,
+    "has_notes": true,
+    "metadata": {
+      "title": "Vid-LLM: A Compact Video-based 3D Multimodal LLM with Reconstruction-Reasoning Synergy",
+      "authors": [
+        "Haijier Chen",
+        "Bo Xu",
+        "Shoujian Zhang",
+        "Haoze Liu",
+        "Jiaxuan Lin",
+        "Jingrong Wang"
+      ],
+      "abstract": "Recent developments in Multimodal Large Language Models (MLLMs) have significantly improved Vision–Language (VL) reasoning in 2D domains. However, extending these capabilities to 3D scene understanding remains a major challenge. Existing 3D Multimodal Large Language Models (3D-MLLMs) often depend on 3D data inputs, which limits scalability and generalization. To address this limitation, we propose Vid-LLM, a video-based 3D-MLLM that directly processes video inputs without requiring external 3D data, making it practical for real-world deployment. In our method, the geometric prior are directly used to improve the performance of the sceen perception. To integrate the geometric cues into the MLLM compactly, we design a Cross-Task Adapter (CTA) module to align the 3D geometric priors with the vision-language representations. To ensure geometric consistency and integrity, we introduce a Metric Depth Model that recovers real-scale geometry from the reconstruction outputs. Finally, the model is fine-tuned with a two-stage distillation optimization strategy, realizing fast convergence and stabilizes training. Extensive experiments across diverse benchmarks verified the effectiveness of our method on 3D Question Answering, 3D Dense Captioning and 3D Visual Grounding tasks, demonstrating the superior multi-task capabilities. Project page: https://chenhaijier.github.io/Vid-LLM/.",
+      "year": 2025,
+      "venue": "ICLR 2026",
+      "arxiv_id": "2509.24385",
+      "arxiv_url": "https://arxiv.org/abs/2509.24385",
+      "pdf_url": "https://arxiv.org/pdf/2509.24385",
+      "doi": "10.48550/arXiv.2509.24385",
+      "published": true,
+      "note": "Published at ICLR 2026. arXiv first submitted 2025-09-29, latest revision (v4) 2026-03-02. Subjects: cs.CV, cs.AI. CC BY 4.0 license. Project page: https://chenhaijier.github.io/Vid-LLM/",
+      "opensource": {
+        "code": [
+          {
+            "url": "https://github.com/chenhaijier/Vid-LLM",
+            "description": "Official GitHub repository (placeholder, code not yet released)",
+            "verified": true
+          }
+        ],
+        "data": [],
+        "model": [],
+        "project_page": "https://chenhaijier.github.io/Vid-LLM/",
+        "summary": "GitHub repo 存在但为 placeholder（仅有 README，代码尚未发布）。HuggingFace checkpoints 和 demo 标记为 Coming Soon。论文承诺将发布完整代码、数据集和预训练权重。"
+      }
+    },
+    "notes": "# Vid-LLM: A Compact Video-based 3D Multimodal LLM with Reconstruction-Reasoning Synergy\n\n## 元信息\n- **Authors**: Haijier Chen, Bo Xu, Shoujian Zhang, Haoze Liu, Jiaxuan Lin, Jingrong Wang\n- **Venue**: ICLR 2026\n- **arXiv**: [link](https://arxiv.org/abs/2509.24385)\n- **DOI**: 10.48550/arXiv.2509.24385\n- **开源**: [code](https://github.com/chenhaijier/Vid-LLM) (placeholder，代码尚未发布) / 暂无数据 / 暂无模型 / [project page](https://chenhaijier.github.io/Vid-LLM/)\n\n---\n\n## 费曼讲解\n\n想象你拿着手机绕着房间走一圈拍了个视频，然后问 AI：\"房间里有几张椅子？沙发在哪里？\"——这就是我们想让 3D 多模态大语言模型做到的事情。\n\n现有的方法要么需要你先用专业设备扫描出点云，要么需要深度相机拍出的 RGBD 数据，再把这些 3D 数据喂给模型。这就好比你必须先建好一栋房子的 BIM 模型，才能让设计师做室内设计——门槛太高了。\n\n我们的核心想法其实很简单：**视频本身就包含了丰富的 3D 信息**。当你拿着手机走一圈，不同角度的画面已经隐含了深度、结构和空间关系。问题是，怎么把这些隐含的几何信息和语言理解能力有效地结合起来？\n\n我们设计了一个叫 **Cross-Task Adapter (CTA)** 的模块，它就像一个\"翻译官\"。想象有两个人——一个擅长看空间结构（几何专家），一个擅长理解语言（语义专家）。CTA 里有一些\"桥接 token\"，它们分别去\"听\"几何专家和语义专家说了什么，然后把两边的信息融合起来。这样，几何专家会告诉语义专家\"这个物体距离你 2 米\"，语义专家也会反过来帮助几何专家\"那是一个沙发，不是一堵墙\"。\n\n还有一个关键问题：从视频重建出来的深度是\"相对深度\"——你只知道 A 比 B 远，但不知道具体多远。这就像你用眼睛看东西知道远近，但说不出精确距离。我们设计了一个 **Metric Depth Model**（度量深度模型），它能从相对深度中恢复出真实的物理尺度。有了真实尺度，模型才能告诉你\"那个桌子长 1.2 米\"而不是\"那个桌子大概比椅子远一点\"。\n\n最后，训练策略也很关键。我们采用两阶段蒸馏：第一阶段用两个\"老师\"（一个几何老师 VGGT，一个语义老师 LLaVA-3D）教共享编码器同时学几何和语义；第二阶段把所有模块联合微调。这就像先分别跟数学老师和语文老师打好基础，再做综合练习。\n\n## 摘要翻译\n\n> 近期多模态大语言模型（MLLMs）的发展显著提升了二维领域的视觉-语言（VL）推理能力。然而，将这些能力扩展到三维场景理解仍然是一个重大挑战。现有的三维多模态大语言模型（3D-MLLMs）通常依赖三维数据输入，这限制了其可扩展性和泛化能力。为了解决这一局限，我们提出了 Vid-LLM，一种基于视频的 3D-MLLM，能够直接处理视频输入而无需外部三维数据，使其在实际部署中更加实用。在我们的方法中，几何先验被直接用于提升场景感知性能。为了将几何线索紧凑地整合到 MLLM 中，我们设计了一个跨任务适配器（CTA）模块，用于对齐三维几何先验与视觉-语言表示。为确保几何一致性和完整性，我们引入了一个度量深度模型，从重建输出中恢复真实尺度的几何信息。最后，模型通过两阶段蒸馏优化策略进行微调，实现快速收敛并稳定训练。在多个基准上的大量实验验证了我们方法在三维问答、三维密集描述和三维视觉定位任务上的有效性，展示了出色的多任务能力。\n\n## 引言翻译\n\n> 大语言模型（LLMs）和多模态大语言模型（MLLMs）的近期进展强化了语言作为通用接口的范式，显著改善了跨模态感知与推理。将这一进展扩展到三维领域，近期研究聚焦于三维感知多模态大语言模型（3D-MLLMs），它们在语言接口下统一了三维场景理解与视觉-语言推理。这一研究方向凸显了将语言锚定在持久化三维空间表示中的重要性，为系统化的场景级推理提供了统一路径。\n>\n> 近期研究在三维视觉-语言（3D VL）推理方面取得了重大进展，但大多数方法依赖复杂的三维输入，在数据收集、预处理和计算方面产生高昂成本。部分模型依赖点云或带有渲染视图或语义-几何特征的重建场景，而其他模型虽然采用更简单的输入，但仍依赖显式的三维场景表示，如与语义表示对齐的重建物体。尽管这些方法有效，但它们依赖深度、姿态或外部模块，导致大量的数据和工程开销以及较高的内存和延迟成本。这种刚性的输入要求和系统复杂性从根本上限制了当前 3D-MLLMs 的可扩展性和可迁移性。\n>\n> 为了克服这些局限，一个更通用的解决方案是使模型能够直接从视频重建场景几何，从而消除对外部深度、姿态或配准模块的依赖。更重要的是，重建和推理本质上是相互依赖的：几何结构支撑语义理解，而语义推理反过来提供上下文先验来指导和优化几何建模。\n>\n> 在本工作中，我们介绍了 Vid-LLM，一个紧凑的模型，能够从单目视频输入中联合执行重建和三维视觉-语言推理。Vid-LLM 的核心组件是一个跨任务适配器（CTA），它紧密耦合重建与推理，实现内在的几何-语义交互及相互增强与约束。CTA 解耦了几何感知和语言感知特征；几何流随后由全局-帧注意力骨干和专用头部处理，用于估计相机姿态和相对深度，再通过度量深度模型进行真实尺度校准。恢复的三维信息随后与语义特征融合构建三维 patch，输入 LLM 进行空间推理。最后，两阶段训练策略确保收敛并提升整体性能。在多个三维视觉-语言基准上的大量实验展示了 Vid-LLM 的性能，并证实了其作为基于视频的三维多模态推理的实用且可扩展框架的有效性。\n>\n> 我们的主要贡献总结如下：\n> - 我们提出了 Vid-LLM 用于多功能三维场景理解。该框架不依赖密集三维输入或先验姿态，使其在实际部署中更加实用。\n> - 我们设计了跨任务适配器来对齐三维几何先验与视觉-语言表示，增强了三维视觉几何先验向 MLLM 的整合。进一步采用两阶段训练策略以提高稳定性和性能。\n> - 在真实数据集上进行了广泛的实验评估。实验结果表明，我们的方法在问答、密集描述和视觉定位方面均取得了优越性能。我们将发布代码以促进交流。\n\n## 论文总结\n\n本文提出了 Vid-LLM，一种基于视频输入的紧凑型三维多模态大语言模型，通过跨任务适配器（CTA）将三维重建分支与视觉-语言推理分支紧密耦合，实现了仅从单目视频即可完成三维问答、三维密集描述和三维视觉定位等任务，并在多个基准上达到或接近使用显式三维数据输入的方法的性能。\n\n## 核心问题\n\n**问题**：现有的 3D-MLLMs 严重依赖点云、重建场景、深度图等显式三维数据输入，这导致数据采集成本高、预处理复杂、计算开销大，从根本上限制了模型的可扩展性和可迁移性。\n\n**为什么重要**：在真实世界部署中，我们最容易获取的输入形式是视频（如手机拍摄），而非专业设备采集的三维数据。如果模型能直接从视频理解和推理三维场景，将极大地降低使用门槛。\n\n**现有方法的不足**：\n1. 基于点云/重建场景的方法（如 3D-LLM、LEO、ChatScene）需要完整的三维重建流水线作为前置\n2. 部分方法虽然使用视频输入但仍依赖外部 3D 模块生成显式几何表示（如 3DRS†）\n3. 简单地将重建几何拼接到 LLM 输入（concatenation pipeline）无法有效利用几何信息进行推理——实验表明 VGGT+LLaVA-3D 的 3D VL 性能远低于端到端方法\n4. 相对尺度几何无法提供可靠的推理线索，需要度量尺度对齐\n\n## 方法详解\n\n### 整体框架\n\nVid-LLM 的架构由以下核心组件构成：\n1. **共享视觉编码器**（DINOv2）：从输入视频帧提取基础视觉 token\n2. **跨任务适配器（CTA）**：将共享特征分解为几何流和语义流，并通过桥接 token 实现双向信息交换\n3. **3D 重建分支**：预测相机姿态、相对深度，通过度量深度模型恢复真实尺度\n4. **3D 视觉-语言推理分支**：将重建几何与语义特征融合构建 3D patch token，输入 LLM 进行推理\n5. **两阶段训练策略**：双教师蒸馏 + 联合优化\n\n### 跨任务适配器（CTA）\n\n这是本文最核心的创新。给定 DINOv2 提取的基础 token $T_{\\text{base}} \\in \\mathbb{R}^{N \\times C}$：\n\n**特征投影**：通过两个轻量 MLP 投影头将共享视觉 token 映射到不同的任务空间：\n$$T_{\\text{geom}} = \\phi_{\\text{geom}}(T_{\\text{base}}), \\quad T_{\\text{lang}} = \\phi_{\\text{lang}}(T_{\\text{base}})$$\n\n**桥接机制**：引入可学习的桥接 token $T_{\\text{bridge}} \\in \\mathbb{R}^{K \\times C}$（默认 $K=16$），它们作为共享记忆单元分别 attend 到几何和语义特征：\n$$T'_{\\text{bridge}} = \\text{Attn}(T_{\\text{bridge}}, T_{\\text{geom}}^{\\text{fused}}, T_{\\text{geom}}^{\\text{fused}}) + \\text{Attn}(T_{\\text{bridge}}, T_{\\text{lang}}^{\\text{fused}}, T_{\\text{lang}}^{\\text{fused}})$$\n\n更新后的桥接 token 再注入回两个特征流，实现几何-语义的双向交互。\n\n**设计优势**：相比直接拼接或交叉注意力，桥接 token 提供了一个稳定的共享隐空间，使几何线索能一致地传递给语义特征，反之亦然。\n\n### 3D 重建模型\n\n**几何编码与预测头**：基于 CTA 增强的几何特征 $T'_{\\text{geom}}$，加上相机 token 和注册 token，通过 Global-Frame Attention 骨干（基于 VGGT 架构）产生整合的几何表示，输入两个预测头：\n- **Camera Head**：估计相机内外参\n- **DPT Head**：预测相对深度图 $\\hat{D}_{\\text{rel}} \\in \\mathbb{R}^{H \\times W}$\n\n**度量深度模型**：DINOv2 特征通过 DPT 风格解码器产生多尺度深度表示。每个像素的深度通过 bin-based 公式建模：\n$$\\hat{d}(i) = \\sum_{k=1}^{N} p_i(k) \\cdot c_i(k)$$\n\n其中 $p_i(k)$ 是第 $k$ 个 bin 的概率，$c_i(k)$ 是自适应精炼的 bin 中心 $c_i(k) = c_k + \\Delta c_i(k)$，$\\Delta c_i(k) = r_k(F_i)$ 从解码器特征预测。\n\n**真实尺度对齐**：通过加权最小二乘法估计相对深度 $\\hat{D}_{\\text{rel}}$ 和度量深度 $\\hat{D}_{\\text{metric}}$ 之间的缩放因子。随机采样 16 张图像计算逐图缩放因子，取中位数作为场景级因子。选择这种对齐策略而非直接使用度量深度作为输出，是因为 DPT 头在纹理细节上比度量深度模型更准确。\n\n### 3D 视觉-语言模型\n\n**3D Patch 构建**：每个 2D 语义特征 $T'_{\\text{lang}}(i,j)$ 利用估计的深度 $\\hat{D}$、相机姿态 $(\\hat{R}, \\hat{t})$ 和内参 $K$ 反投影到 3D 空间：\n$$P_v(i,j) = \\hat{R}^{-1} K^{-1} [i, j, 1]^\\top \\hat{D}(i,j) - \\hat{R}^{-1} \\hat{t}$$\n\n3D 坐标通过 MLP 编码为位置嵌入 $P'_v(i,j)$，与语义特征融合：\n$$T_{3D}(i,j) = T'_{\\text{lang}}(i,j) + P'_v(i,j)$$\n\n这些 3D patch token 送入 LLM（基于 LLaVA 架构）进行空间推理。\n\n### 训练策略\n\n**Stage 1 - 双教师蒸馏**：\n- 几何教师：预训练的 VGGT 的 DINO 编码器\n- 语义教师：LLaVA-3D 的 CLIP 编码器\n- 蒸馏损失：$L_{\\text{distill}} = L_{\\text{geo}}^{\\text{feat}} + L_{\\text{lang}}^{\\text{feat}} + \\lambda L_{\\text{sc}}$\n  - 几何损失 $L_{\\text{geo}}^{\\text{feat}}$：patch 级 L2 损失\n  - 语义损失 $L_{\\text{lang}}^{\\text{feat}}$：余弦相似度损失\n  - 结构一致性损失 $L_{\\text{sc}}$：基于拼接特征的 Gram 矩阵差异（Frobenius 范数），确保几何和语义特征之间的结构关系与教师一致\n\n**Stage 2 - 联合优化**：\n$$L_{\\text{joint}} = L_{\\text{recon-task}} + L_{\\text{VL-task}} + L_{\\text{MD}}$$\n\n- $L_{\\text{recon-task}}$：多任务重建损失（相机 + 深度 + 点云）\n- $L_{\\text{VL-task}}$：3D VL 推理损失（交叉熵 + 边界框回归 + 匹配损失）\n- $L_{\\text{MD}}$：度量深度损失，结合全局尺度惩罚和鲁棒局部精炼项：\n$$L_{\\text{MD}} = b^2 + \\frac{1}{K} \\sum_{i=1}^{K} \\frac{(e_i - b)^2}{1 + \\alpha |e_i - b|}$$\n其中 $e_i = \\log(d_i^{\\text{pred}} + \\epsilon) - \\log(d_i^{\\text{gt}} + \\epsilon)$ 是对数深度误差。\n\n**关键设计**：3D-VL 推理分支的损失不用于优化 3D 重建模型（单向梯度流），确保 CTA 作为稳定的桥梁。\n\n## 实验与可视化\n\n### 实验设置\n\n- **视觉骨干**：DINOv2-L（24 层 Transformer，隐藏维度 1024）\n- **数据处理**：每场景均匀采样 32 帧，短边 resize 到 518，裁剪使长宽为 14 的倍数\n- **优化器**：AdamW（$\\beta_1=0.9, \\beta_2=0.999$，权重衰减 0.05，梯度裁剪 1.0）\n- **评估数据集**：\n  - 3D QA：ScanQA、SQA3D\n  - 3D Dense Captioning：Scan2Cap\n  - 3D Visual Grounding：ScanRefer、Multi3DRefer、Nr3D、Sr3D\n  - 重建：ScanNet、NYU Depth v2、Co3Dv2、RealEstate10K\n\n### 主要结果\n\n**3D 问答**（ScanQA）：Vid-LLM CIDEr 101.9，在 video-based 模型中最佳，超过 3DRS†（94.7）11%，接近最好的 3D-based 模型 LLaVA-3D（103.1）。\n\n**3D 密集描述**（Scan2Cap@0.5）：CIDEr 81.5，在 video-based 方法中最佳，接近 3D-based 最佳的 3DRS（86.1）。\n\n**3D 视觉定位**：\n- ScanRefer Acc@0.5：63.2（超越所有 3D-based 和 video-based 方法）\n- Multi3DRefer Acc@0.5：56.1（同上）\n- Nr3D Overall：65.4（超越 SceneVerse 64.9）\n- Sr3D Overall：77.8（超越 SceneVerse 77.5）\n\n**与联合重建-推理模型对比**：\n- 相比 concatenation pipeline（VGGT+LLaVA-3D†），Vid-LLM 在所有 3D VL 任务上全面领先，尽管后者重建分数更高（0.591 vs 0.582），说明简单拼接几何信息不足以支撑推理\n- 相比 Uni3DR²（需要 GT 相机位姿），Vid-LLM 重建质量略优（0.582 vs 0.580），3D VL 平均提升 47.6%\n- 推理速度最快：1.6 s/scene（vs concatenation 的 2.7 s/scene）\n\n**重建性能**：\n- 相机姿态估计接近 VGGT 教师模型\n- NYU 深度估计 $\\delta_1=0.987$，log10=0.010（与 VGGT† 相当）\n- ScanNet F-score 0.582（vs VGGT† 0.580）\n\n### 消融实验\n\n**CTA 模块**：\n- 无 CTA：ScanQA 33.7、Scan2Cap 36.6、ScanRefer 34.1——共享表示无法同时支撑两个任务\n- Concat-SA（拼接后自注意力）：38.2、41.9、39.6——改善有限\n- 无 Bridge 的交叉注意力：40.8、45.6、42.2——更好但无稳定共享空间\n- 完整 CTA（16 tokens）：45.7、53.2、48.4——最优\n- 4/8/16/32 bridge tokens 对比：16 个达到最佳平衡\n\n**度量深度模块**：\n- 无度量深度：ScanQA 仅 29.6（几乎失败），尺度歧义破坏了几何一致性\n- 有度量深度无对齐：42.1（改善但仍受限）\n- 完整方案：45.7\n\n**训练策略**：\n- 单阶段训练收敛慢且损失高\n- 单教师蒸馏效果有限\n- 去掉关系损失收敛更慢\n- 完整两阶段策略效果最佳\n\n### 可视化分析\n\n论文展示了 ScanRefer 上的 3D 视觉定位可视化（在重建点云上绘制预测 3D 边界框）以及三种任务的定性结果。挑战案例分析表明：当视频视角有限时（部分物体未被观测），重建不完整导致计数或定位错误；反光表面导致深度估计不稳定；但当 2D 语义线索充足时，CTA 和桥接机制仍能产生准确描述。\n\n## 相关工作\n\n**3D-MLLMs**：现有方法（3D-LLM、LEO、ChatScene、LLaVA-3D、3DRS 等）大多依赖点云或重建场景等显式三维输入。VGLLM 也采用视频输入但使用 VGGT 几何编码器提取 3D 特征。Vid-LLM 的区别在于通过 CTA 实现重建-推理的紧密耦合，而非简单的两阶段流水线。\n\n**3D 重建**：从经典多视图几何（COLMAP）到神经隐式表示（NeRF）再到前馈 Transformer 架构（DUSt3R、MASt3R、VGGT）。Vid-LLM 基于 VGGT 架构构建重建分支，并额外引入度量深度模型恢复真实尺度。\n\n**几何先验在 VLM 中的使用**：现有方法分三类——显式输入注入（深度/点云作为额外模态）、数据和训练层面的内化（空间标注语料/几何蒸馏）、模块化或 prompt-based 集成。Vid-LLM 属于通过视频驱动的重建分支生成几何并实现与语义分支对齐的方式。\n\n## 潜在未来工作\n\n1. **改进重建分支的几何保真度**：论文挑战案例分析表明，重建不完整是主要失败模式。更强的重建能力（更好的遮挡处理、反光表面处理）可以直接提升 3D VL 性能。\n2. **扩展到更多 3D VL 任务**：当前覆盖 QA、Captioning、Grounding 三类任务，可扩展到 3D 规划、具身交互等。\n3. **更高效的视频编码**：当前均匀采样 32 帧，对于长视频或实时场景可能需要更高效的帧选择或流式处理策略。\n4. **泛化到户外场景**：当前主要在室内 ScanNet 场景评估，户外场景的深度范围更大、纹理更丰富，可能需要不同的策略。\n5. **与 LLM 的更深整合**：当前将 3D patch token 作为 LLM 输入，可以探索更紧密的整合方式，如在 LLM 中间层注入几何信息。\n6. **开源代码和模型发布**：论文承诺将发布代码，但截至目前 GitHub 仓库仍为 placeholder。\n"
+  },
+  {
+    "slug": "affin-space",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "AffIn-Space: Learning Affine-Invariant Representations for 3D Spatial Understanding with MLLMs",
+      "authors": [
+        "Zhenyu Lu",
+        "Liupeng Li",
+        "Jinpeng Wang",
+        "Haoqian Kang",
+        "Manyuan Zhang",
+        "Yan Feng",
+        "Ke Chen",
+        "Yaowei Wang"
+      ],
+      "abstract": "Multimodal Large Language Models (MLLMs) have achieved remarkable progress in visual understanding, yet their spatial reasoning remains fragile, degrading rapidly under changes in viewpoint and viewing distance. This limitation stems from a fundamental geometric fragility: existing paradigms remain entangled with the view-dependent pixel grid. In this paper, we propose AffIn-Space, a framework that enforces strict affine invariance to enable robust spatial understanding. Our approach introduces a two-stage explicit decoupling mechanism: (1) explicit geometric resampling by utilizing decomposed affine quantities to spatially align 3D features to a canonical state, and (2) affine-invariant constraints via an orthogonal projection mechanism that strips pose-dependent noise from hidden states while retaining geometric semantics through conditional reconstruction.",
+      "year": 2026,
+      "venue": "ICML 2026 (Poster)",
+      "arxiv_id": "unknown",
+      "arxiv_url": "unknown",
+      "pdf_url": "unknown",
+      "doi": "unknown",
+      "published": true,
+      "note": "ICML 2026 poster presentation (Poster #63168). No arXiv preprint found as of 2026-05-23. The authors state that code will be publicly released. No public PDF link available yet from the ICML virtual site. PDF not downloaded - no public URL found."
+    },
+    "notes": null
+  },
+  {
+    "slug": "eg-3dvg",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "EG-3DVG: Expression and Geometry Aware Grounding Decoder for 3D Visual Grounding",
+      "authors": [
+        "GwangWook Park",
+        "Hyo-Jun Lee",
+        "Jong-Hyeon Baek",
+        "Hanul Kim",
+        "Yeong Jun Koh"
+      ],
+      "abstract": "We address three challenges in 3D visual grounding: cross-modal misalignment, intra-class confusion arising from insufficient understanding of fine-grained expression cues, and geometric reasoning errors caused by inaccurate aggregation of spatially relevant visual features. We propose EG-3DVG, a unified framework that addresses these issues through an expression and geometry aware grounding decoder integrating two attention modules: position-guided expression cross-attention (PECA) and geometry-aware masked attention (GMA). We also introduce expression-aware contrastive learning (ECL) to strengthen alignment between target object tokens and expression-relevant words. Experiments on ScanRefer and SR3D/NR3D benchmarks show state-of-the-art performance in 3D bounding box localization and mask prediction.",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "arxiv_id": "",
+      "arxiv_url": "",
+      "pdf_url": "",
+      "doi": "",
+      "published": true,
+      "note": "CVPR 2026 accepted paper (poster). No arXiv preprint found. PDF requires CVPR registration to access (https://cvpr.thecvf.com/virtual/2026/poster/40250). Official GitHub repo: https://github.com/Gwan9Wook/EG3DVG (mostly empty as of May 2026). Conference takes place June 5, 2026; paper PDF likely to become publicly available after the conference."
+    },
+    "notes": null
+  },
+  {
+    "slug": "grounded-3d-aware-spatial-vlm",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "Grounded 3D-Aware Spatial Vision-Language Modeling",
+      "system_name": "GR3D",
+      "authors": [
+        "An-Chieh Cheng",
+        "Yang Fu",
+        "Yatai Ji",
+        "Ligeng Zhu",
+        "Guanqi Zhan",
+        "Zhuoyang Zhang",
+        "Zhaojing Yang",
+        "Song Han",
+        "Yao Lu",
+        "Pavlo Molchanov",
+        "Vidya Nariyambut Murali",
+        "Jan Kautz",
+        "Xiaolong Wang",
+        "Danny Yin",
+        "Sifei Liu"
+      ],
+      "abstract": "GR3D is a spatial vision language model equipped with three complementary grounding capabilities—explicit 2D grounding, implicit 2D grounding, and monocular 3D grounding—within a single framework. The implicit grounding mechanism identifies entity mentions during generation and inserts the corresponding region tokens into the text stream. A region-prompted monocular 3D grounding design predicts 3D bounding boxes in the camera view from grounded region queries, supported by intrinsic-aware normalization and dense geometric supervision. These capabilities let GR3D decompose complex spatial understanding problems into grounded 2D perception followed by 3D inference. The model achieves consistent improvements across grounded and non-grounded spatial benchmarks, demonstrating grounding as an effective inductive bias for strengthening spatial understanding in VLMs.",
+      "year": 2026,
+      "venue": "CVPR 2026 (Poster)",
+      "presentation": "Saturday, June 6, 2026, 10:45 AM - 12:45 PM PDT, ExHall F",
+      "arxiv_id": null,
+      "arxiv_url": null,
+      "pdf_url": null,
+      "doi": null,
+      "published": true,
+      "cvpr_page": "https://cvpr.thecvf.com/virtual/2026/poster/39015",
+      "related_paper": {
+        "title": "3D Aware Region Prompted Vision Language Model",
+        "system_name": "SR-3D",
+        "arxiv_id": "2509.13317",
+        "arxiv_url": "https://arxiv.org/abs/2509.13317",
+        "note": "Earlier related work by same first author (An-Chieh Cheng) and overlapping co-authors. SR-3D connects single-view 2D images and multi-view 3D data via a shared visual token space. GR3D appears to be an extended/newer version with additional grounding capabilities."
+      },
+      "note": "CVPR 2026 论文，会议尚未召开（2026年6月6日），目前无公开 PDF 可下载。无 arXiv 预印本。相关早期工作 SR-3D (arXiv:2509.13317) 由同一第一作者发表，项目页面: https://www.anjiecheng.me/sr3d"
+    },
+    "notes": null
+  },
+  {
+    "slug": "merge3d",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "Merge3D: Efficient 3D Multimodal LLMs via Joint 2D-3D Token Merging",
+      "authors": [
+        "Tianbo Pan",
+        "Xingyi Yang",
+        "Xinchao Wang"
+      ],
+      "abstract": "3D scene understanding is increasingly powered by Multimodal Large Language Models (MLLMs), yet the primary bottleneck remains the substantial computational burden associated with processing multi-view, lengthy visual token sequences. We propose Merge3D, a geometry-aware token merging framework that integrates both 3D geometry and 2D semantic information. At its core is a Semantic-Geometric Token Merger (SemGeo Merger), which bridges the modalities: 2D attention is used to select semantically salient dominant tokens, while a hybrid 2D+3D similarity is employed to aggregate contextual tokens from spatially coherent 3D neighborhoods. This design preserves 3D structural priors and inter-frame correspondences under aggressive compression. Extensive experiments on 3D scene understanding benchmarks, including Scan2Cap, CV-Bench, and BLINK, show that Merge3D achieves up to 70% visual token reduction and up to approximately 3x inference speedup while maintaining strong performance.",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "arxiv_id": "unknown",
+      "arxiv_url": "unknown",
+      "pdf_url": "unknown",
+      "doi": "unknown",
+      "published": true,
+      "cvpr_poster_url": "https://cvpr.thecvf.com/virtual/2026/poster/38939",
+      "youtube_url": "https://www.youtube.com/watch?v=LpVsuM_st1k",
+      "note": "CVPR 2026 poster, presentation on June 7, 2026. No arXiv preprint found as of May 23, 2026. The CVF Open Access PDF is also not yet available (404). Authors are from NUS (National University of Singapore), Dept of Electrical and Computer Engineering, Xinchao Wang's lab. Tianbo Pan is a PhD student advised by Xinchao Wang."
+    },
+    "notes": null
+  },
+  {
+    "slug": "ord",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "ORD: Object-Relation Decoupling for Generalized 3D Visual Grounding",
+      "authors": [
+        "Ronggang Huang",
+        "FanSen Meng",
+        "Huaidong Zhang",
+        "Xuemiao Xu"
+      ],
+      "abstract": "3D visual grounding aims to accurately identify and ground target objects in 3D space based on natural language descriptions, where relative relations between target and anchor objects play a crucial role. However, in existing methods, relative relations are often tightly entangled with entity semantics, which encourages models to rely on semantic shortcuts from entity names, thereby hurting generalization in multi-view and complex multi-object settings. To address this, we propose an object-relation decoupling framework that treats target-anchor relations as first-class geometric and semantic primitives and models them explicitly through three components: (1) a scene-level relative geometric representation that encodes direction and distance between target and anchor, along with a scene-level hyper-object token as a unified prior for scale and viewpoint; (2) a predicate-decoupled cross-modal alignment strategy that preserves only predicates carrying spatial relational semantics while masking out all other tokens, thereby suppressing semantic leakage from entity names; and (3) an anchor-guided regression module that predicts auxiliary anchors and samples features to guide entity semantics learning from text, explicitly injecting target-anchor priors. Extensive experiments on multiple 3D visual grounding benchmarks demonstrate that our method consistently outperforms state-of-the-art approaches with strong robustness and generalization under challenging multi-view and relation-intensive settings.",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "arxiv_id": "",
+      "arxiv_url": "",
+      "pdf_url": "",
+      "doi": "",
+      "published": true,
+      "note": "CVPR 2026 poster paper. Conference date: June 7, 2026. No arXiv preprint found. No public PDF available yet as CVPR 2026 has not taken place (as of May 23, 2026). CVPR virtual poster page: https://cvpr.thecvf.com/virtual/2026/poster/38718. Same research group as ViewSRD (ICCV 2025).",
+      "cvpr_url": "https://cvpr.thecvf.com/virtual/2026/poster/38718"
+    },
+    "notes": null
+  },
+  {
+    "slug": "pv-ground",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "PV-Ground: Text-Guided Point-Voxel Interaction for 3D Visual Grounding",
+      "authors": [
+        "Junpeng Shang",
+        "Feifei Shao",
+        "Jun Xiao",
+        "Lin Li",
+        "Hongwei Wang",
+        "Dongfang Ma"
+      ],
+      "abstract": "3D visual grounding aims to localize target objects in 3D scenes based on free-form textual descriptions. Existing approaches predominantly employ point-based backbones, which require aggressive downsampling that inevitably loses fine-grained spatial details of the original point cloud, thereby degrading grounding performance. In this paper, we propose PV-Ground, a novel 3D VG architecture based on effective text-guided point-voxel feature interaction. PV-Ground leverages the complementary strengths of both voxels and keypoints: it employs a voxel-based feature extraction backbone to preserve high-resolution spatial details, while utilizing compact keypoints to aggregate local features for efficient, deep interaction with the textual query. We further propose a text-guided keypoint sampling module to adaptively concentrate the keypoint distribution around the text-described object, thus improving the discriminability and grounding accuracy. Extensive experiments on ScanRefer and ReferIt3D benchmarks demonstrate that PV-Ground significantly outperforms existing methods, achieving a performance improvement of 5.1% on the ScanRefer dataset and 5.6% on the ReferIt3D dataset. Additionally, PV-Ground shows strong generalizability, with over 4% improvement in the segmentation task.",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "arxiv_id": "unknown",
+      "arxiv_url": "",
+      "pdf_url": "",
+      "doi": "",
+      "published": true,
+      "note": "CVPR 2026 poster paper. Conference: Jun 6-12, 2026, Denver, Colorado. Poster session: Sun, Jun 7, 2026, 2:30-4:30 PM PDT, ExHall A. No publicly available PDF yet (CVF open access not published, no arXiv preprint found). GitHub repo (https://github.com/AaNnWwTt/PV-Ground) exists but code is being prepared.",
+      "cvpr_poster_page": "https://cvpr.thecvf.com/virtual/2026/poster/38627",
+      "github": "https://github.com/AaNnWwTt/PV-Ground",
+      "youtube": "https://www.youtube.com/watch?v=N3hrHWahy9s"
+    },
+    "notes": null
+  },
+  {
+    "slug": "apeiria",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "APEIRIA: Distilling Neuro-Symbolic Programs into 3D Multi-modal LLMs",
+      "authors": [
+        "unknown"
+      ],
+      "abstract": "unknown",
+      "year": "unknown",
+      "venue": "unknown",
+      "arxiv_id": "unknown",
+      "arxiv_url": "",
+      "pdf_url": "",
+      "doi": "",
+      "published": false,
+      "note": "Paper not found on any major academic search platform. Searched: arXiv (Web + API), DBLP, Semantic Scholar, Google Scholar (CAPTCHA blocked), OpenReview, Hugging Face Papers, Papers with Code, Bing, Google (rate limited), ResearchGate (403). All returned zero results. The paper may not yet be publicly available, may be under a different title, or may not exist as a published work."
+    },
+    "notes": null
+  },
+  {
+    "slug": "dsgcr",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": {
+      "title": "DSGCR: Decomposed Spectral Geometry-Aware Cross-Modal Semantic Representation for 3D Visual Grounding",
+      "authors": [
+        "unknown"
+      ],
+      "abstract": "unknown",
+      "year": "unknown",
+      "venue": "unknown",
+      "arxiv_id": "unknown",
+      "arxiv_url": "unknown",
+      "pdf_url": "unknown",
+      "doi": "unknown",
+      "published": false,
+      "note": "搜索未果。已尝试 arXiv、DBLP、Google Scholar、OpenReview、Crossref、Papers with Code、Bing 等渠道，均未找到该论文。该论文可能尚不存在、极新未被索引、或发表在非主流渠道。"
+    },
+    "notes": null
+  },
+  {
+    "slug": "uz3dvg-zero-shot-3d-visual-grounding",
+    "has_pdf": false,
+    "has_notes": false,
+    "metadata": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "title": "Reasoning in Space via Grounding in the World",
+  "authors": ["Yiming Chen", "Zekun Qi", "Wenyao Zhang", "Xin Jin", "Li Zhang", "Peidong Liu"],
+  "abstract": "In this paper, we claim that 3D visual grounding is the cornerstone of spatial reasoning and introduce the Grounded-Spatial Reasoner (GS-Reasoner) to explore the effective spatial representations that bridge the gap between them. Existing 3D LLMs suffer from the absence of a unified 3D representation capable of jointly capturing semantic and geometric information. This deficiency is manifested either in poor performance on grounding or in an excessive reliance on external modules, ultimately hindering the seamless integration of grounding and spatial reasoning. To address this, we propose a simple yet effective dual-path pooling mechanism that tightly aligns geometric features with both semantic and positional cues, constructing a unified image patch-based 3D representation that encapsulates all essential information without increasing the number of input tokens. Leveraging this holistic representation, GS-Reasoner is the first 3D LLM that achieves autoregressive grounding entirely without external modules while delivering performance comparable to state-of-the-art models, establishing a unified and self-contained framework for 3D spatial reasoning. To further bridge grounding and spatial reasoning, we introduce the Grounded Chain-of-Thought (GCoT) dataset. This dataset is meticulously curated to include both 3D bounding box annotations for objects referenced in reasoning questions and step-by-step reasoning paths that integrate grounding as a core component of the problem-solving process. Extensive experiments demonstrate that GS-Reasoner achieves impressive results on 3D visual grounding, which in turn significantly enhances its spatial reasoning capabilities, leading to state-of-the-art performance.",
+  "year": 2025,
+  "venue": "ICLR 2025",
+  "arxiv_id": "2510.13800",
+  "arxiv_url": "https://arxiv.org/abs/2510.13800",
+  "pdf_url": "https://arxiv.org/pdf/2510.13800",
+  "doi": "10.48550/arXiv.2510.13800",
+  "published": true,
+  "note": "Accepted at ICLR 2025. arXiv submitted October 15, 2025. 20 pages, 7 figures. Categories: cs.CV.",
+  "opensource": {
+    "code": [{"url": "https://github.com/WU-CVGL/GS-Reasoner", "description": "Official implementation with training and evaluation scripts", "verified": true}],
+    "data": [
+      {"url": "https://huggingface.co/datasets/ymccccc/GS-Reasoner-Data", "description": "GCoT dataset (156k QA pairs with grounded CoT annotations)", "verified": true},
+      {"url": "https://huggingface.co/datasets/ymccccc/vggt_slam_processed_data", "description": "VGGT-SLAM processed data for inference pipeline", "verified": true}
+    ],
+    "model": [
+      {"url": "https://huggingface.co/ymccccc/GS-Reasoner", "description": "GS-Reasoner 8B main checkpoint", "verified": true},
+      {"url": "https://huggingface.co/ymccccc/GS-Reasoner-Diverse", "description": "GS-Reasoner 8B diverse variant", "verified": true},
+      {"url": "https://huggingface.co/ymccccc/sonata-wo-normal", "description": "Sonata point cloud encoder without normal", "verified": true}
+    ],
+    "project_page": "https://yiming-cc.github.io/gs-reasoner/",
+    "summary": "代码（Apache-2.0）、模型权重（3个HF模型）、数据集（GCoT+VGGT-SLAM数据）均已开源，配有完整的训练和评估脚本。"
+  }
+}

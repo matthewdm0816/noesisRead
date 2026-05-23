@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Papers (large files, manage manually)
+papers/*/paper*.pdf
+papers/*/paper_text.txt
+
+# Claude Code local config
+.claude/settings.local.json
+
+# OS
+.DS_Store
+Thumbs.db

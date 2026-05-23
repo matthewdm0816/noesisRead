@@ -1,0 +1,22 @@
+{
+  "title": "AffIn-Space: Learning Affine-Invariant Representations for 3D Spatial Understanding with MLLMs",
+  "authors": [
+    "Zhenyu Lu",
+    "Liupeng Li",
+    "Jinpeng Wang",
+    "Haoqian Kang",
+    "Manyuan Zhang",
+    "Yan Feng",
+    "Ke Chen",
+    "Yaowei Wang"
+  ],
+  "abstract": "Multimodal Large Language Models (MLLMs) have achieved remarkable progress in visual understanding, yet their spatial reasoning remains fragile, degrading rapidly under changes in viewpoint and viewing distance. This limitation stems from a fundamental geometric fragility: existing paradigms remain entangled with the view-dependent pixel grid. In this paper, we propose AffIn-Space, a framework that enforces strict affine invariance to enable robust spatial understanding. Our approach introduces a two-stage explicit decoupling mechanism: (1) explicit geometric resampling by utilizing decomposed affine quantities to spatially align 3D features to a canonical state, and (2) affine-invariant constraints via an orthogonal projection mechanism that strips pose-dependent noise from hidden states while retaining geometric semantics through conditional reconstruction.",
+  "year": 2026,
+  "venue": "ICML 2026 (Poster)",
+  "arxiv_id": "unknown",
+  "arxiv_url": "unknown",
+  "pdf_url": "unknown",
+  "doi": "unknown",
+  "published": true,
+  "note": "ICML 2026 poster presentation (Poster #63168). No arXiv preprint found as of 2026-05-23. The authors state that code will be publicly released. No public PDF link available yet from the ICML virtual site. PDF not downloaded - no public URL found."
+}

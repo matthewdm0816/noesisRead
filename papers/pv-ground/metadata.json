@@ -1,0 +1,16 @@
+{
+  "title": "PV-Ground: Text-Guided Point-Voxel Interaction for 3D Visual Grounding",
+  "authors": ["Junpeng Shang", "Feifei Shao", "Jun Xiao", "Lin Li", "Hongwei Wang", "Dongfang Ma"],
+  "abstract": "3D visual grounding aims to localize target objects in 3D scenes based on free-form textual descriptions. Existing approaches predominantly employ point-based backbones, which require aggressive downsampling that inevitably loses fine-grained spatial details of the original point cloud, thereby degrading grounding performance. In this paper, we propose PV-Ground, a novel 3D VG architecture based on effective text-guided point-voxel feature interaction. PV-Ground leverages the complementary strengths of both voxels and keypoints: it employs a voxel-based feature extraction backbone to preserve high-resolution spatial details, while utilizing compact keypoints to aggregate local features for efficient, deep interaction with the textual query. We further propose a text-guided keypoint sampling module to adaptively concentrate the keypoint distribution around the text-described object, thus improving the discriminability and grounding accuracy. Extensive experiments on ScanRefer and ReferIt3D benchmarks demonstrate that PV-Ground significantly outperforms existing methods, achieving a performance improvement of 5.1% on the ScanRefer dataset and 5.6% on the ReferIt3D dataset. Additionally, PV-Ground shows strong generalizability, with over 4% improvement in the segmentation task.",
+  "year": 2026,
+  "venue": "CVPR 2026",
+  "arxiv_id": "unknown",
+  "arxiv_url": "",
+  "pdf_url": "",
+  "doi": "",
+  "published": true,
+  "note": "CVPR 2026 poster paper. Conference: Jun 6-12, 2026, Denver, Colorado. Poster session: Sun, Jun 7, 2026, 2:30-4:30 PM PDT, ExHall A. No publicly available PDF yet (CVF open access not published, no arXiv preprint found). GitHub repo (https://github.com/AaNnWwTt/PV-Ground) exists but code is being prepared.",
+  "cvpr_poster_page": "https://cvpr.thecvf.com/virtual/2026/poster/38627",
+  "github": "https://github.com/AaNnWwTt/PV-Ground",
+  "youtube": "https://www.youtube.com/watch?v=N3hrHWahy9s"
+}
