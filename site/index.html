@@ -28,6 +28,29 @@
   --radius: 8px;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+  --code-block-bg: #1e293b;
+  --code-block-fg: #e2e8f0;
+}
+:root.dark {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --text: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --accent: #60a5fa;
+  --accent-light: #1e293b;
+  --green: #4ade80;
+  --green-bg: #052e16;
+  --yellow: #facc15;
+  --yellow-bg: #1c1917;
+  --red: #f87171;
+  --red-bg: #1c0a0a;
+  --gray: #52525b;
+  --gray-bg: #1e1e1e;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+  --code-block-bg: #0d1117;
+  --code-block-fg: #c9d1d9;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -60,6 +83,36 @@ a:hover { text-decoration: underline; }
   margin-top: 0.25rem;
   font-size: 0.9rem;
 }
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.theme-toggle {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  padding: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .icon-moon { display: block; }
+.theme-toggle .icon-sun  { display: none; }
+:root.dark .theme-toggle .icon-moon { display: none; }
+:root.dark .theme-toggle .icon-sun  { display: block; }
 .stats {
   display: flex;
   gap: 1.5rem;
@@ -126,12 +179,14 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem 1.25rem;
-  cursor: pointer;
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .paper-card:hover {
   box-shadow: var(--shadow-md);
   border-color: #d6d3d1;
+}
+:root.dark .paper-card:hover {
+  border-color: #3f3f46;
 }
 .paper-card.expanded {
   border-color: var(--accent);
@@ -168,6 +223,38 @@ a:hover { text-decoration: underline; }
   font-weight: 500;
 }
 .paper-info { flex: 1; min-width: 0; }
+.paper-toggle {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+.paper-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+.paper-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+}
+.paper-card.expanded .paper-toggle svg {
+  transform: rotate(180deg);
+}
+.paper-toggle-hidden {
+  visibility: hidden;
+}
 .paper-title {
   font-size: 1rem;
   font-weight: 600;
@@ -220,8 +307,45 @@ a:hover { text-decoration: underline; }
   margin-top: 1rem;
   border-top: 1px solid var(--border);
   padding-top: 1rem;
+  padding-bottom: 3.5rem;
+  position: relative;
 }
 .paper-card.expanded .paper-notes { display: block; }
+.notes-collapse-bar {
+  display: none;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0;
+  text-align: right;
+  background: linear-gradient(to top, var(--surface) 60%, transparent);
+  pointer-events: none;
+}
+.paper-card.expanded .notes-collapse-bar { display: block; }
+.notes-collapse-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s;
+}
+.notes-collapse-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.notes-collapse-btn svg {
+  width: 14px;
+  height: 14px;
+}
 .notes-content {
   font-size: 0.9rem;
   line-height: 1.75;
@@ -256,8 +380,8 @@ a:hover { text-decoration: underline; }
   font-size: 0.85em;
 }
 .notes-content pre {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--code-block-bg);
+  color: var(--code-block-fg);
   padding: 1rem;
   border-radius: var(--radius);
   overflow-x: auto;
@@ -289,13 +413,8 @@ a:hover { text-decoration: underline; }
 
 /* Toggle hint */
 .expand-hint {
-  font-size: 0.75rem;
-  color: var(--gray);
-  text-align: right;
-  margin-top: 0.25rem;
+  display: none;
 }
-.paper-card.expanded .expand-hint .hint-text { display: none; }
-.paper-card:not(.expanded) .expand-hint .collapse-text { display: none; }
 
 /* Empty state */
 .empty {
@@ -331,8 +450,16 @@ a:hover { text-decoration: underline; }
 
 <div class="header">
   <div class="header-inner">
-    <h1>Paper Reading Notes</h1>
-    <p>3D Visual Grounding & Spatial Reasoning</p>
+    <div class="header-top">
+      <div>
+        <h1>Paper Reading Notes</h1>
+        <p>3D Visual Grounding & Spatial Reasoning</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
     <div class="stats" id="stats"></div>
   </div>
 </div>
@@ -442,13 +569,23 @@ function renderCard(paper, idx) {
   // Notes
   let notesHtml = '';
   if (paper.notes) {
-    notesHtml = `<div class="paper-notes"><div class="notes-content" id="notes-${idx}">${renderMarkdown(paper.notes)}</div></div>`;
+    const collapseSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
+    notesHtml = `
+      <div class="paper-notes">
+        <div class="notes-content" id="notes-${idx}">${renderMarkdown(paper.notes)}</div>
+        <div class="notes-collapse-bar">
+          <button class="notes-collapse-btn" onclick="toggleCard(this)" title="Collapse notes">Collapse ${collapseSvg}</button>
+        </div>
+      </div>`;
   }
 
   const noteCount = paper.notes ? '' : '<span style="color:var(--gray);font-size:0.8rem;">No notes available</span>';
 
+  const chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  const toggleClass = paper.notes ? 'paper-toggle' : 'paper-toggle paper-toggle-hidden';
+
   return `
-    <div class="paper-card" data-status="${status}" data-idx="${idx}" onclick="toggleCard(this)">
+    <div class="paper-card" data-status="${status}" data-idx="${idx}">
       <div class="paper-top">
         <div class="paper-info">
           <div class="paper-title">${escHtml(title)}</div>
@@ -458,12 +595,10 @@ function renderCard(paper, idx) {
           </div>
         </div>
         <div class="paper-badges">${badges}</div>
+        <button class="${toggleClass}" onclick="toggleCard(this)" title="Expand/collapse notes">${chevron}</button>
       </div>
       ${summary ? `<div class="paper-summary">${escHtml(summary)}</div>` : ''}
       ${links ? `<div class="paper-links">${links}</div>` : ''}
-      <div class="expand-hint">
-        ${paper.notes ? '<span class="hint-text">Click to expand notes</span><span class="collapse-text">Click to collapse</span>' : ''}
-      </div>
       ${notesHtml}
     </div>
   `;
@@ -481,11 +616,11 @@ function renderMarkdown(md) {
   return marked.parse(text, { breaks: false, gfm: true });
 }
 
-function toggleCard(el) {
-  el.classList.toggle('expanded');
-  if (el.classList.contains('expanded')) {
-    // Render math in this card
-    const notesEl = el.querySelector('.notes-content');
+function toggleCard(btn) {
+  const card = btn.closest('.paper-card');
+  card.classList.toggle('expanded');
+  if (card.classList.contains('expanded')) {
+    const notesEl = card.querySelector('.notes-content');
     if (notesEl && window.renderMathInElement) {
       renderMathInElement(notesEl, {
         delimiters: [
@@ -552,6 +687,17 @@ function applyFilters() {
   });
   renderPapers(filtered);
 }
+
+// Theme
+const root = document.documentElement;
+const saved = localStorage.getItem('theme');
+if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  root.classList.add('dark');
+}
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  root.classList.toggle('dark');
+  localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+});
 
 // KaTeX auto-render wait
 function waitForKaTeX() {
