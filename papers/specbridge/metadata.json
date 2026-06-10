@@ -1,0 +1,29 @@
+{
+  "title": "SpecBridge: Spectral Structure Alignment and Transitive Bridging for 3D–2D–Text Pre-Training",
+  "authors": ["unknown"],
+  "abstract": "unknown",
+  "year": 2026,
+  "venue": "IJCAI 2026 (unverified)",
+  "arxiv_id": "",
+  "arxiv_url": "",
+  "pdf_url": "",
+  "doi": "",
+  "published": false,
+  "note": "PDF unavailable. Paper not found on arXiv, Google Scholar, Semantic Scholar, OpenReview, DBLP, or GitHub after exhaustive search (2026-06-10). Only 'SpecBridge' paper found is arXiv:2601.17204 (mass spectrometry, different paper). IJCAI 2026 proceedings may not be indexed yet. paper.pdf does not exist.",
+  "search_log": [
+    {"strategy": "arXiv WebFetch: SpecBridge Spectral Structure Alignment 3D 2D Text", "result": "0 results"},
+    {"strategy": "WebSearch: \"SpecBridge\" \"Spectral Structure Alignment\" 3D 2D Text", "result": "0 results"},
+    {"strategy": "WebSearch: \"SpecBridge\" IJCAI 2026", "result": "0 results"},
+    {"strategy": "Google Scholar: \"SpecBridge\" \"Spectral Structure Alignment\" \"Transitive Bridging\"", "result": "0 results; found different SpecBridge (mass spec, arXiv:2601.17204)"},
+    {"strategy": "arXiv API: ti:SpecBridge", "result": "1 result but different paper (mass spectrometry)"},
+    {"strategy": "arXiv API: ti:SpecBridge AND abs:3D AND abs:text", "result": "0 results"},
+    {"strategy": "Semantic Scholar API", "result": "429 Rate Limited"},
+    {"strategy": "OpenReview API: SpecBridge", "result": "0 results"},
+    {"strategy": "OpenReview API: spectral structure alignment transitive bridging", "result": "0 relevant results"},
+    {"strategy": "DuckDuckGo exact title search", "result": "0 results"},
+    {"strategy": "Bing exact title search", "result": "0 relevant results"},
+    {"strategy": "GitHub API: SpecBridge 3D 2D text", "result": "0 results"},
+    {"strategy": "DBLP", "result": "certificate error"},
+    {"strategy": "IJCAI-26.org", "result": "certificate error"}
+  ]
+}

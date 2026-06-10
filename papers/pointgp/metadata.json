@@ -1,0 +1,25 @@
+{
+  "title": "PointGP: Geometry-Primed Attention for Point Cloud Analysis",
+  "authors": ["Yong Yang", "Jianming Huang", "Mengyuan Ge", "Chunyang Huang", "Bingbing Hu", "Junfeng Yao"],
+  "abstract": "This paper studies the limitations of Transformer-based methods for 3D point cloud understanding. Current mainstream methods follow a feature-centric paradigm where attention weights are entirely driven by semantic similarity. The authors find that in deeper networks, this design easily triggers feature homogenization (also known as rank collapse), weakening the structural selectivity of attention. To address this challenge, the paper proposes the PointGP framework, introducing a geometry-guided modeling perspective. Unlike existing methods that only use geometric information as auxiliary encoding, PointGP treats geometric topology as a stable structural anchor to generate attention. The framework contains two core modules: (1) a Semantic-Guided Manifold Rectifier that adaptively adjusts the metric space based on semantic cues, and (2) a Dual-Stream Geometry Kernel that explicitly derives attention weights from the rectified geometric topology. This design decouples explicit feature matching from attention generation while implicitly guiding feature aggregation through geometry-aware rectification. Experiments on point cloud classification, part segmentation, and scene segmentation benchmarks demonstrate that PointGP achieves competitive performance with high parameter efficiency, outperforming current mainstream methods.",
+  "year": 2026,
+  "venue": "IJCAI-ECAI 2026 (The 35th International Joint Conference on Artificial Intelligence), Main Track, CCF-B",
+  "arxiv_id": null,
+  "arxiv_url": null,
+  "pdf_url": null,
+  "doi": null,
+  "published": true,
+  "note": "Paper accepted at IJCAI-ECAI 2026 (August 15-21, Bremen, Germany). PDF not yet publicly available as of 2026-06-10 - proceedings have not been published. No preprint found on arXiv or other servers. Paper info sourced from Xiamen University Digital Media Computing Center announcement (https://cdmc.xmu.edu.cn/info/1002/5544.htm). Authors are from Xiamen University.",
+  "affiliation": "Xiamen University (厦门大学), Digital Media Computing Center",
+  "conference_date": "2026-08-15 to 2026-08-21",
+  "conference_location": "Bremen, Germany",
+  "source_url": "https://cdmc.xmu.edu.cn/info/1002/5544.htm",
+  "pdf_downloaded": false,
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": null,
+    "summary": "暂未找到开源代码、数据或模型。论文尚未正式发表，PDF未公开。"
+  }
+}

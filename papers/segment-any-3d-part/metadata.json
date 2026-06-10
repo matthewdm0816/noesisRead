@@ -1,0 +1,14 @@
+{
+  "title": "Segment Any 3D-Part in a Scene from a Sentence",
+  "authors": ["Hongyu Wu", "Pengwan Yang", "Yuki M. Asano", "Cees G. M. Snoek"],
+  "abstract": "Existing datasets and methods for 3D scene understanding are predominantly limited to object-level comprehension, primarily due to the costly and labor-intensive process of annotating 3D parts. To address this, we introduce 3D-PU, the first large-scale 3D dataset with dense part annotations, constructed via an innovative and cost-effective method for building synthetic 3D scenes. We further propose OpenPart3D, a 3D-input-only framework designed to effectively tackle the challenges of part-level segmentation in 3D scenes. Extensive experiments demonstrate that our approach achieves strong generalization capabilities across various 3D scene datasets for open-vocabulary 3D scene understanding at the part level.",
+  "year": 2025,
+  "venue": "IJCAI 2026",
+  "arxiv_id": "2506.19331",
+  "arxiv_url": "https://arxiv.org/abs/2506.19331",
+  "pdf_url": "https://arxiv.org/pdf/2506.19331",
+  "doi": "10.48550/arXiv.2506.19331",
+  "published": true,
+  "note": "arXiv preprint submitted 2025-06-24. Target venue IJCAI 2026.",
+  "category": "cs.CV"
+}
