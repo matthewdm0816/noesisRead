@@ -11,5 +11,12 @@
   "published": true,
   "cvpr_poster_url": "https://cvpr.thecvf.com/virtual/2026/poster/38939",
   "youtube_url": "https://www.youtube.com/watch?v=LpVsuM_st1k",
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": "https://tianbo-pan.github.io/merge3d/",
+    "summary": "项目页面标注 Code Coming Soon / arXiv Coming Soon，代码和预印本均尚未公开（截至 2026-06-10）。"
+  },
   "note": "CVPR 2026 poster, presentation on June 7, 2026. No arXiv preprint found as of May 23, 2026. The CVF Open Access PDF is also not yet available (404). Authors are from NUS (National University of Singapore), Dept of Electrical and Computer Engineering, Xinchao Wang's lab. Tianbo Pan is a PhD student advised by Xinchao Wang."
 }

@@ -1,0 +1,32 @@
+{
+  "title": "Multimodal Robust Prompt Distillation for 3D Point Cloud Models",
+  "authors": [
+    "Xiang Gu",
+    "Liming Lu",
+    "Xu Zheng",
+    "Anan Du",
+    "Yongbin Zhou",
+    "Shuchao Pang"
+  ],
+  "abstract": "Adversarial attacks pose a significant threat to 3D point cloud models. Existing defense methods suffer from high computational overhead and poor generalization ability across diverse attack types. In this paper, we propose Multimodal Robust Prompt Distillation (MRPD), a teacher-student framework that learns lightweight prompts by aligning the student point cloud model's features with robust embeddings from three distinct teachers: a vision model using depth projections, a high-performance 3D model, and a text encoder. A confidence-gated mechanism dynamically balances the contribution of all input modalities during distillation. Since the distillation occurs only at training time, MRPD introduces no additional computational cost at inference. Extensive experiments show that MRPD substantially outperforms state-of-the-art defense methods against a wide range of white-box and black-box attacks while also achieving better performance on clean data.",
+  "year": 2026,
+  "venue": "AAAI 2026 (Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 40, No. 6)",
+  "pages": "4320-4328",
+  "arxiv_id": "2511.21574",
+  "arxiv_url": "https://arxiv.org/abs/2511.21574",
+  "pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/view/42429/46390",
+  "doi": "10.1609/aaai.v40i6.42429",
+  "published": true,
+  "affiliations": [
+    "Nanjing University of Science and Technology",
+    "The Hong Kong University of Science and Technology (Guangzhou)",
+    "INSAIT, Sofia University, St. Kliment Ohridski",
+    "Nanjing University of Industry Technology"
+  ],
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "submitted": "2025-11-26",
+  "note": "PDF downloaded from AAAI official site (ojs.aaai.org). Text extracted to paper_text.txt (45210 chars)."
+}

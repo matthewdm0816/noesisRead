@@ -15,25 +15,33 @@
     "Vidya Nariyambut Murali",
     "Jan Kautz",
     "Xiaolong Wang",
-    "Danny Yin",
+    "Hongxu Yin",
     "Sifei Liu"
   ],
   "abstract": "GR3D is a spatial vision language model equipped with three complementary grounding capabilities—explicit 2D grounding, implicit 2D grounding, and monocular 3D grounding—within a single framework. The implicit grounding mechanism identifies entity mentions during generation and inserts the corresponding region tokens into the text stream. A region-prompted monocular 3D grounding design predicts 3D bounding boxes in the camera view from grounded region queries, supported by intrinsic-aware normalization and dense geometric supervision. These capabilities let GR3D decompose complex spatial understanding problems into grounded 2D perception followed by 3D inference. The model achieves consistent improvements across grounded and non-grounded spatial benchmarks, demonstrating grounding as an effective inductive bias for strengthening spatial understanding in VLMs.",
   "year": 2026,
   "venue": "CVPR 2026 (Poster)",
   "presentation": "Saturday, June 6, 2026, 10:45 AM - 12:45 PM PDT, ExHall F",
-  "arxiv_id": null,
-  "arxiv_url": null,
-  "pdf_url": null,
+  "arxiv_id": "2605.30307",
+  "arxiv_url": "https://arxiv.org/abs/2605.30307",
+  "pdf_url": "https://arxiv.org/pdf/2605.30307",
   "doi": null,
   "published": true,
   "cvpr_page": "https://cvpr.thecvf.com/virtual/2026/poster/39015",
+  "project_page": "https://www.anjiecheng.me/gr3d",
   "related_paper": {
     "title": "3D Aware Region Prompted Vision Language Model",
     "system_name": "SR-3D",
     "arxiv_id": "2509.13317",
     "arxiv_url": "https://arxiv.org/abs/2509.13317",
-    "note": "Earlier related work by same first author (An-Chieh Cheng) and overlapping co-authors. SR-3D connects single-view 2D images and multi-view 3D data via a shared visual token space. GR3D appears to be an extended/newer version with additional grounding capabilities."
+    "note": "Earlier related work by same first author (An-Chieh Cheng) and overlapping co-authors. SR-3D connects single-view 2D images and multi-view 3D data via a shared visual token space. GR3D is an extended version with additional grounding capabilities."
   },
-  "note": "CVPR 2026 论文，会议尚未召开（2026年6月6日），目前无公开 PDF 可下载。无 arXiv 预印本。相关早期工作 SR-3D (arXiv:2509.13317) 由同一第一作者发表，项目页面: https://www.anjiecheng.me/sr3d"
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": "https://www.anjiecheng.me/gr3d",
+    "summary": "代码和模型权重均未开源，项目页面标注 'Coming Soon'。训练数据全部来自公开数据集（Omni3D、EmbodiedScan、DepthLM、RefSpatial 等）。"
+  },
+  "note": "CVPR 2026 论文。arXiv:2605.30307。代码和权重 Coming Soon。相关早期工作 SR-3D (arXiv:2509.13317)。"
 }

@@ -1,0 +1,29 @@
+{
+  "title": "Sparse3DPR: Training-Free 3D Hierarchical Scene Parsing and Task-Adaptive Subgraph Reasoning from Sparse RGB Views",
+  "authors": [
+    "Haida Feng",
+    "Hao Wei",
+    "Zewen Xu",
+    "Haolin Wang",
+    "Chade Li",
+    "Yihong Wu"
+  ],
+  "abstract": "The paper proposes Sparse3DPR, a training-free framework for open-ended scene understanding using pre-trained LLMs with sparse-view RGB inputs. It introduces a hierarchical plane-enhanced scene graph that supports open vocabulary, using planar structures as spatial anchors for clearer reasoning chains. A task-adaptive subgraph extraction method dynamically filters irrelevant information, reducing noise and improving efficiency. Results show a 28.7% EM@1 improvement and a 78.2% speedup compared with ConceptGraphs on the Space3D-Bench, with comparable performance to training-based methods on ScanQA and real-world experiments confirming robustness and generalization.",
+  "year": 2026,
+  "venue": "AAAI 2026",
+  "arxiv_id": "2511.07813",
+  "arxiv_url": "https://arxiv.org/abs/2511.07813",
+  "pdf_url": "https://arxiv.org/pdf/2511.07813",
+  "doi": "https://doi.org/10.48550/arXiv.2511.07813",
+  "published": true,
+  "note": "Published at AAAI 2026. Conference page: https://ojs.aaai.org/index.php/AAAI/article/view/37393. PDF also available at: https://ojs.aaai.org/index.php/AAAI/article/view/37393/41355",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "submitted": "2025-11-11",
+  "affiliations": [
+    "State Key Laboratory of Multimodal Artificial Intelligence Systems, Institute of Automation, Chinese Academy of Sciences",
+    "School of Artificial Intelligence, University of Chinese Academy of Sciences"
+  ]
+}

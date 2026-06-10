@@ -4,10 +4,10 @@
   "abstract": "unknown",
   "year": "unknown",
   "venue": "unknown",
-  "arxiv_id": "unknown",
-  "arxiv_url": "unknown",
-  "pdf_url": "unknown",
-  "doi": "unknown",
+  "arxiv_id": null,
+  "arxiv_url": null,
+  "pdf_url": null,
+  "doi": null,
   "published": false,
-  "note": "搜索未果。已尝试 arXiv、DBLP、Google Scholar、OpenReview、Crossref、Papers with Code、Bing 等渠道，均未找到该论文。该论文可能尚不存在、极新未被索引、或发表在非主流渠道。"
+  "note": "PDF unavailable. Exhaustive search (2026-06-10) across: arXiv search page + API (0 results), Google Scholar (0 results for exact title and keyword variants), DBLP (0 results), Crossref (0 results), OpenReview (0 results), Papers with Code (redirected, 0 results), Bing (only unrelated Microsoft support pages), GitHub API (0 repos), ResearchGate (403 blocked). Searched with: exact full title, acronym 'DSGCR', keyword combinations ('decomposed spectral' + 'cross-modal' + '3D grounding', 'spectral geometry' + '3D visual grounding', 'DSGCR' + 'spectral' + 'grounding'). The paper does not appear to exist in any indexed academic database. Possible explanations: (1) paper not yet published, (2) title may differ from provided version, (3) paper may exist only in a non-indexed venue, local proceedings, or behind a paywall."
 }

@@ -1,0 +1,14 @@
+{
+  "title": "Zero-Shot 3D Question Answering via Hierarchical View-to-Token Transportation",
+  "authors": ["Dongsheng Wang", "Dawei Su", "Hui Huang"],
+  "abstract": "This paper addresses zero-shot 3D scene understanding using 2D Vision-Language Models. Multiple 2D views are sampled from 3D point clouds and fed into pre-trained VLMs for question answering. We propose KeyVT, a hierarchical approach for context collection at view and token levels. We combine pixel features with camera parameters and assess view importance based on both semantic content and geometric position. We also tackle redundancy among patches across selected views by identifying representative tokens under the optimal transport (OT) framework, where view and key tokens are formulated as two discrete distributions in the embedding space. Key tokens aim to cover all view features by minimizing the OT distance. Evaluated on three widely used benchmarks, our method shows significant improvements over existing tuning-free methods with performance comparable to training-based approaches.",
+  "year": 2026,
+  "venue": "ICML 2026",
+  "arxiv_id": "2606.03100",
+  "arxiv_url": "https://arxiv.org/abs/2606.03100",
+  "pdf_url": "https://arxiv.org/pdf/2606.03100",
+  "doi": "unknown",
+  "published": true,
+  "note": "Accepted at ICML 2026. 19 pages, 6 figures. Categories: cs.CV, cs.LG.",
+  "opensource": {}
+}

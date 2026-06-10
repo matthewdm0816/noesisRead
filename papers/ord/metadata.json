@@ -15,5 +15,12 @@
   "doi": "",
   "published": true,
   "note": "CVPR 2026 poster paper. Conference date: June 7, 2026. No arXiv preprint found. No public PDF available yet as CVPR 2026 has not taken place (as of May 23, 2026). CVPR virtual poster page: https://cvpr.thecvf.com/virtual/2026/poster/38718. Same research group as ViewSRD (ICCV 2025).",
-  "cvpr_url": "https://cvpr.thecvf.com/virtual/2026/poster/38718"
+  "cvpr_url": "https://cvpr.thecvf.com/virtual/2026/poster/38718",
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": "",
+    "summary": "No open-source code, data, or model found. The paper does not mention any public repository. CVPR 2026 open access PDF is available via CVF."
+  }
 }

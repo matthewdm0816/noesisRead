@@ -1,13 +1,20 @@
 {
   "title": "APEIRIA: Distilling Neuro-Symbolic Programs into 3D Multi-modal LLMs",
-  "authors": ["unknown"],
-  "abstract": "unknown",
-  "year": "unknown",
-  "venue": "unknown",
-  "arxiv_id": "unknown",
-  "arxiv_url": "",
-  "pdf_url": "",
+  "authors": ["Wentao Mo", "Yang Liu"],
+  "abstract": "Current 3D spatial reasoning methods face a fundamental trade-off: neuro-symbolic 3D (NS3D) concept learners achieve interpretable reasoning through compositional programs but are constrained to closed-set concept vocabularies and simple programs; end-to-end 3D multi-modal LLMs (3D MLLMs) could handle complex natural language and open-vocabulary concepts but suffer from black-box reasoning without explicit spatial verification. We introduce APEIRIA, a neuro-symbolic 3D MLLM to bridge two paradigms by distilling symbolic reasoning patterns into MLLMs with natural language chain-of-thought. Our three-stage curriculum progressively builds reasoning capabilities: a) 3D perception alignment grounds object visual-geometric features to the LLM, b) CoT-SFT teaches query decomposition and stepwise verification from symbolic program traces, and c) CoT-RL extends reasoning patterns to open-set concepts and deeply nested instructions. By transferring reasoning patterns rather than concept-specific knowledge, APEIRIA preserves key NS3D virtues: transparent reasoning and modular interchangeability of planning and perception components. Evaluations on grounding, question answering, and captioning show that APEIRIA surpasses prior NS3D methods and matches state-of-the-art 3D MLLMs on 3D spatial reasoning datasets, unifying symbolic methods' systematic reasoning with MLLMs' flexibility.",
+  "year": 2026,
+  "venue": "ICML 2026",
+  "arxiv_id": "2606.01215",
+  "arxiv_url": "https://arxiv.org/abs/2606.01215",
+  "pdf_url": "https://arxiv.org/pdf/2606.01215",
   "doi": "",
-  "published": false,
-  "note": "Paper not found on any major academic search platform. Searched: arXiv (Web + API), DBLP, Semantic Scholar, Google Scholar (CAPTCHA blocked), OpenReview, Hugging Face Papers, Papers with Code, Bing, Google (rate limited), ResearchGate (403). All returned zero results. The paper may not yet be publicly available, may be under a different title, or may not exist as a published work."
+  "published": true,
+  "note": "ICML 2026, Seoul, South Korea. Wangxuan Institute of Computer Technology, Peking University.",
+  "opensource": {
+    "code": [{"url": "https://github.com/oceanflowlab/APEIRIA", "description": "Official implementation with training scripts for all 3 stages (perception alignment, CoT-SFT, CoT-RL), evaluation utilities, and config files. 33 commits, CC-BY-4.0 license.", "verified": true}],
+    "data": [{"url": "https://huggingface.co/kmichiru/OpenApeiria", "description": "Model checkpoints hosted on HuggingFace. Data uses existing datasets: ScanNet, MMScan, Sr3D, ScanRefer, Multi3DRefer, SQA3D, Scan2Cap.", "verified": true}],
+    "model": [{"url": "https://huggingface.co/kmichiru/OpenApeiria", "description": "Pre-trained model checkpoints (4B and 8B variants based on Qwen3-VL).", "verified": true}],
+    "project_page": "https://github.com/oceanflowlab/APEIRIA",
+    "summary": "Code fully released on GitHub (CC-BY-4.0) with training/eval scripts. Model checkpoints on HuggingFace. Uses existing public datasets."
+  }
 }

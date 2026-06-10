@@ -1,0 +1,35 @@
+{
+  "title": "3D-DLP: Self-supervised 3D Object-centric Scene Representation Learning",
+  "authors": ["unknown"],
+  "abstract": "unknown",
+  "year": 2026,
+  "venue": "ICML 2026",
+  "arxiv_id": "unknown",
+  "arxiv_url": "",
+  "pdf_url": "",
+  "doi": "unknown",
+  "published": false,
+  "note": "PDF unavailable. Paper not found on any public source as of 2026-06-10. Search process documented below.",
+  "search_log": [
+    "WebSearch: \"3D-DLP\" \"Self-supervised 3D Object-centric\" - No results found",
+    "WebSearch: \"3D-DLP\" \"Scene Representation Learning\" site:arxiv.org - No relevant results",
+    "WebSearch: 3D-DLP self-supervised 3D object-centric scene representation ICML 2026 - No results",
+    "WebSearch: \"3D-DLP\" arxiv 2025 2026 object-centric - No results",
+    "WebSearch: \"3D-DLP\" paper 2025 2026 - No results",
+    "WebFetch arxiv.org search for '3D-DLP self-supervised object-centric' - Zero results",
+    "WebFetch arxiv.org search for '3D-DLP' - 13 results, all about 3D printing/DLP projectors, none about object-centric learning",
+    "WebFetch Google Scholar '3D-DLP' 'Self-supervised 3D Object-centric' - Zero results",
+    "WebFetch Google Scholar '3D-DLP' 3D object-centric - 2 results, both about DLP projectors for subsurface scattering (unrelated)",
+    "WebFetch OpenReview ICML 2025 accepted papers - Page did not load paper list",
+    "WebFetch OpenReview ICML 2026 venue page - Page did not load",
+    "WebFetch OpenReview search for '3D-DLP' - Page did not load search results",
+    "Conclusion: Paper is not publicly available. ICML 2026 proceedings likely not yet published. No preprint on arXiv."
+  ],
+  "opensource": {
+    "code": [],
+    "data": [],
+    "model": [],
+    "project_page": "",
+    "summary": "Paper not publicly available; cannot check open-source status."
+  }
+}

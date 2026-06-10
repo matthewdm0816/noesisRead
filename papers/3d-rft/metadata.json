@@ -1,0 +1,20 @@
+{
+  "title": "3D-RFT: Reinforcement Fine-Tuning for Video-based 3D Scene Understanding",
+  "authors": ["Xiongkun Linghu", "Jiangyong Huang", "Baoxiong Jia", "Siyuan Huang"],
+  "abstract": "The paper introduces 3D-RFT, the first framework to extend RLVR (Reinforcement Learning with Verifiable Rewards) to video-based 3D perception and reasoning. Existing methods rely on Supervised Fine-Tuning (SFT), where token-level cross-entropy loss acts as an indirect proxy for optimization, causing misalignment between training goals and performance metrics. 3D-RFT directly optimizes the model towards evaluation metrics using Group Relative Policy Optimization (GRPO) with task-specific reward functions based on metrics like 3D IoU and F1-Score. The approach first activates 3D-aware Multi-modal Large Language Models (MLLMs) via SFT, then applies reinforcement fine-tuning. Experiments show 3D-RFT-4B achieves state-of-the-art performance on various video-based 3D scene understanding tasks and significantly outperforms larger models (e.g., VGLLM-8B) on benchmarks for 3D video detection, 3D visual grounding, and spatial reasoning.",
+  "year": 2026,
+  "venue": "ICML 2026",
+  "arxiv_id": "2603.04976",
+  "arxiv_url": "https://arxiv.org/abs/2603.04976",
+  "pdf_url": "https://arxiv.org/pdf/2603.04976v1",
+  "doi": "unknown",
+  "published": true,
+  "note": "arXiv preprint submitted 5 March 2026. User reports accepted at ICML 2026. Categories: cs.CV, cs.AI.",
+  "opensource": {
+    "code": [{"url": "https://github.com/3D-RFT/3D-RFT", "description": "Official implementation", "verified": false}],
+    "data": [],
+    "model": [{"url": "https://huggingface.co/EricLHK/3D-RFT/tree/main", "description": "Model checkpoints on HuggingFace", "verified": false}],
+    "project_page": "https://3d-rft.github.io/",
+    "summary": "Official code on GitHub and model checkpoints on HuggingFace are available."
+  }
+}

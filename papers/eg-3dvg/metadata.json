@@ -15,5 +15,12 @@
   "pdf_url": "",
   "doi": "",
   "published": true,
-  "note": "CVPR 2026 accepted paper (poster). No arXiv preprint found. PDF requires CVPR registration to access (https://cvpr.thecvf.com/virtual/2026/poster/40250). Official GitHub repo: https://github.com/Gwan9Wook/EG3DVG (mostly empty as of May 2026). Conference takes place June 5, 2026; paper PDF likely to become publicly available after the conference."
+  "note": "CVPR 2026 accepted paper (poster). No arXiv preprint found. PDF requires CVPR registration to access (https://cvpr.thecvf.com/virtual/2026/poster/40250). Official GitHub repo: https://github.com/Gwan9Wook/EG3DVG (placeholder only as of June 2026, README only, no code released yet). Conference takes place June 5, 2026; paper PDF likely to become publicly available after the conference.",
+  "opensource": {
+    "code": [{"url": "https://github.com/Gwan9Wook/EG3DVG", "description": "Official PyTorch implementation (placeholder - README only, no code released yet)", "verified": true}],
+    "data": [],
+    "model": [],
+    "project_page": "",
+    "summary": "GitHub repo exists as placeholder with README only; no actual code, models, or data released yet."
+  }
 }
